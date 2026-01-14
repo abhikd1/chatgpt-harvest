@@ -98,20 +98,22 @@ async def generate_tldr(content: str, system_prompt: str = None, user_prompt: st
     return await asyncio.to_thread(_call_groq)
 
 async def call_ollama(model: str, system_prompt: str, user_prompt: str):
-    """Hits the local Ollama API."""
-    url = "http://localhost:11434/api/generate"
-    prompt_content = f"System: {system_prompt}\nUser: {user_prompt}"
+    """Hits the local Ollama API using the correct Chat endpoint."""
+    url = "http://localhost:11434/api/chat"
     
     try:
         async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.post(url, json={
                 "model": model,
-                "prompt": prompt_content,
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ],
                 "stream": False,
                 "options": {"temperature": 0.3}
             })
             if response.status_code == 200:
-                res = response.json().get("response", "").strip()
+                res = response.json().get("message", {}).get("content", "").strip()
                 return res
             return None
     except Exception as e:
@@ -128,27 +130,31 @@ async def generate_deep_research_tldr(content: str, system_prompt: str = None, u
     start_time = datetime.now()
     clean_text = re.sub(r'<[^>]*>', '', content)[:4000]
     
-    # STEP 1: LLaMA Deep Reasoning (Targeting llama3.1)
-    print("STEP 1: LLaMA Deep Reasoning [LOAD: ~7GB RAM]...")
+    # STEP 1: LLaMA Deep Reasoning
     reasoning_sys = "You are a Deep Reasoning Agent. Think step-by-step. Analyze the core logic and technical nuances. Output your thought process first."
-    
-    # Try Ollama first, fallback to Groq
-    tldr_reasoning = await call_ollama("llama3.1", reasoning_sys, clean_text)
-    
-    if not tldr_reasoning:
-        print("Fallback: Using Groq for Step 1...")
-        tldr_reasoning = await generate_tldr(content, reasoning_sys, "Extract core logic.", model="llama-3.3-70b-versatile")
+    tldr_reasoning = None
 
-    # STEP 2: Phi-3 Explanation (Targeting phi3:mini)
-    print("STEP 2: Phi-3 Explanation [LOAD: ~4GB RAM]...")
+    # Priority: GROQ (Cloud) -> OLLAMA (Local)
+    if groq_client and api_key and api_key != "FAILED_KEY":
+        print("STEP 1: LLaMA Deep Reasoning (Cloud Groq 70B)...")
+        tldr_reasoning = await generate_tldr(content, reasoning_sys, "Extract core logic.", model="llama-3.3-70b-versatile")
+    
+    if not tldr_reasoning or "Error:" in tldr_reasoning:
+        print("Fallback: Using Local Ollama for Step 1 (Llama 3.1)...")
+        tldr_reasoning = await call_ollama("llama3.1", reasoning_sys, clean_text)
+
+    # STEP 2: Concise Explanation
     explain_sys = system_prompt or "Provide a punchy 1-sentence TL;DR based on the reasoning provided."
     explain_user = f"REASONING:\n{tldr_reasoning}\n\nCONTENT:\n{clean_text}\n\nFinal 1-sentence summary:"
-    
-    tldr_final = await call_ollama("phi3:mini", explain_sys, explain_user)
-    
-    if not tldr_final:
-        print("Fallback: Using Groq for Step 2...")
+    tldr_final = None
+
+    if groq_client and api_key and api_key != "FAILED_KEY":
+        print("STEP 2: Concise Explanation (Cloud Groq Llama 8B)...")
         tldr_final = await generate_tldr(content, explain_sys, explain_user, model="llama-3.1-8b-instant")
+    
+    if not tldr_final or "Error:" in tldr_final:
+        print("Fallback: Using Local Ollama for Step 2 (Phi-3)...")
+        tldr_final = await call_ollama("phi3:mini", explain_sys, explain_user)
     
     end_time = datetime.now()
     duration = (end_time - start_time).total_seconds()
