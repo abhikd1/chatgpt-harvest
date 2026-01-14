@@ -6,19 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lossless Capture Viewer</title>
     <script>
-        // CRITICAL: Load theme BEFORE render to prevent FOUC
         if (localStorage.getItem('theme') === 'dark') {
             document.documentElement.setAttribute('data-theme', 'dark');
         }
     </script>
     <style>
-        /* 
-           🎨 CHATGPT VISUAL FIDELITY SCHEMA (STRICT)
-           Implementation of the 1:1 Engineering Reference
-        */
-
         :root {
-            /* 1. COLORS (LIGHT MODE BY DEFAULT) */
             --bg-page: #ffffff;
             --text-primary: #0d0d0d;
             --text-secondary: #6b7280;
@@ -26,13 +19,10 @@
             --code-text: #111827;
             --inline-code-bg: #f3f4f6;
             --border-color: #e5e7eb;
-
-            /* 2. FONTS (MOST IMPORTANT) */
             --font-sans: "Söhne", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
         }
 
-        /* Support for Dark Mode via Toggle */
         html[data-theme="dark"] {
             --bg-page: #0f0f10;
             --text-primary: #e5e7eb;
@@ -54,9 +44,7 @@
             color: var(--text-primary);
             font-family: var(--font-sans);
             font-size: 16px;
-            /* SCHEMA: 16px */
             line-height: 1.75;
-            /* SCHEMA: 1.75 (CRITICAL FOR SPACING) */
             -webkit-font-smoothing: antialiased;
         }
 
@@ -67,7 +55,6 @@
             min-height: 100vh;
         }
 
-        /* 3. TYPOGRAPHY & SPACING */
         p,
         ul,
         ol,
@@ -75,10 +62,8 @@
         table,
         pre {
             margin-bottom: 1.5rem;
-            /* Better flow spacing */
         }
 
-        /* SCHEMA: Headings are same size as body, 600 weight */
         h1,
         h2,
         h3,
@@ -92,19 +77,14 @@
             color: var(--text-primary);
         }
 
-        /* 4. CODE BLOCKS - THE BIGGEST ISSUE BLOCK */
         pre {
             background-color: var(--code-bg);
             color: var(--code-text);
             padding: 12px 14px;
-            /* SCHEMA: 12px 14px */
             border-radius: 8px;
-            /* SCHEMA: 8px */
             font-family: var(--font-mono);
             font-size: 14px;
-            /* SCHEMA: 14px */
             line-height: 1.6;
-            /* SCHEMA: 1.6 */
             overflow-x: auto;
             border: 1px solid var(--border-color);
         }
@@ -114,7 +94,6 @@
             font-size: inherit;
         }
 
-        /* Inline Code */
         :not(pre)>code {
             background-color: var(--inline-code-bg);
             padding: 2px 6px;
@@ -122,47 +101,6 @@
             font-size: 0.95em;
         }
 
-        /* Syntax Highlighting Adjustment */
-        html[data-theme="dark"] .mtk3 {
-            color: #93c5fd;
-        }
-
-        html[data-theme="dark"] .mtk5 {
-            color: #86efac;
-        }
-
-        /* Light Mode Default Syntax (Matching GPT Light) */
-        .mtk1 {
-            color: var(--text-primary);
-        }
-
-        .mtk3 {
-            color: #2563eb;
-        }
-
-        /* Keywords (Blue) */
-        .mtk5 {
-            color: #16a34a;
-        }
-
-        /* Strings (Green) */
-        .mtk8 {
-            color: #6b7280;
-        }
-
-        /* Comments */
-        .mtk6 {
-            color: #d97706;
-        }
-
-        /* Numbers */
-        .mtk11 {
-            color: #7c3aed;
-        }
-
-        /* Functions */
-
-        /* 6. TABLES - MINIMAL & FLAT */
         table {
             border-collapse: collapse;
             width: 100%;
@@ -181,13 +119,29 @@
             font-weight: 600;
         }
 
-        /* Metadata & Controls */
-        .metadata {
-            font-size: 0.85em;
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-color);
+        .control-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 4px 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+            background: var(--bg-page);
+        }
+
+        .control-btn:hover {
+            background: var(--inline-code-bg);
+        }
+
+        .save-btn {
+            border-color: #10b981;
+            color: #10b981;
+        }
+
+        .delete-btn:hover {
+            border-color: #ef4444;
+            background: #fee2e2;
         }
 
         .theme-toggle {
@@ -204,14 +158,19 @@
             font-size: 0.8em;
             z-index: 1000;
         }
+
+        .editing {
+            outline: 2px solid #3b82f6;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(59, 130, 246, 0.05);
+        }
     </style>
 </head>
 
 <body>
     <button class="theme-toggle" onclick="toggleTheme()">☀️ / 🌙</button>
-
     <div class="container">
-        <!-- Content will be injected here -->
         {{CONTENT_PLACEHOLDER}}
     </div>
 
@@ -228,9 +187,51 @@
             }
         }
 
-        // Load saved theme
-        if (localStorage.getItem('theme') === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
+        async function editEntry(id) {
+            const entry = document.getElementById(id);
+            const content = entry.querySelector('.content');
+            content.contentEditable = true;
+            content.classList.add('editing');
+            entry.querySelector('.edit-btn').style.display = 'none';
+            entry.querySelector('.save-btn').style.display = 'inline-block';
+            content.focus();
+        }
+
+        async function saveEntry(id) {
+            const entry = document.getElementById(id);
+            const content = entry.querySelector('.content');
+            const newHtml = content.innerHTML;
+
+            const response = await fetch('/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id, html: newHtml })
+            });
+
+            if (response.ok) {
+                content.contentEditable = false;
+                content.classList.remove('editing');
+                entry.querySelector('.edit-btn').style.display = 'inline-block';
+                entry.querySelector('.save-btn').style.display = 'none';
+            } else {
+                alert('Failed to save changes.');
+            }
+        }
+
+        async function deleteEntry(id) {
+            if (!confirm('Are you sure you want to delete this entry?')) return;
+
+            const response = await fetch('/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id })
+            });
+
+            if (response.ok) {
+                document.getElementById(id).remove();
+            } else {
+                alert('Failed to delete entry.');
+            }
         }
     </script>
 </body>
