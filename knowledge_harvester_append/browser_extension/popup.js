@@ -38,6 +38,15 @@ document.getElementById('captureBtn').addEventListener('click', async () => {
                     target.setAttribute('style', css);
                 }
 
+                const siteName = (() => {
+                    const host = window.location.hostname;
+                    if (host.includes('chatgpt') || host.includes('openai')) return 'ChatGPT';
+                    if (host.includes('gemini.google')) return 'Gemini';
+                    if (host.includes('claude')) return 'Claude';
+                    if (host.includes('deepseek')) return 'DeepSeek';
+                    return host;
+                })();
+
                 const sel = window.getSelection();
 
                 // --- CASE 1: SURGICAL SELECTION ---
@@ -74,7 +83,7 @@ document.getElementById('captureBtn').addEventListener('click', async () => {
                     // Remove UI buttons from fragment
                     container.querySelectorAll('svg, button, .sr-only').forEach(x => x.remove());
 
-                    return { html: container.innerHTML, source: "Selection" };
+                    return { html: container.innerHTML, source: `${siteName} (Selection)` };
                 }
 
                 // --- CASE 2: AUTOMATIC ASSISTANT BLOCK ---
@@ -95,7 +104,7 @@ document.getElementById('captureBtn').addEventListener('click', async () => {
                 }
 
                 clone.querySelectorAll('svg, button, .sr-only, [aria-hidden="true"]').forEach(x => x.remove());
-                return { html: clone.innerHTML, source: "Assistant Message" };
+                return { html: clone.innerHTML, source: `${siteName} (Message)` };
             }
         });
 
