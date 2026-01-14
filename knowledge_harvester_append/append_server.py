@@ -102,9 +102,28 @@ async def update_entry(data: UpdateData):
         with open(MASTER_FILE, 'r', encoding='utf-8') as f:
             content = f.read()
         
-        # Use content markers for the actual surgical replacement
-        pattern = rf'(<!-- ENTRY_START_{data.id} -->.*?<div class="content">).*?(</div>\s*?</div>\s*?<!-- ENTRY_END_{data.id} -->)'
-        new_content = re.sub(pattern, rf'\1\n                {data.html}\n            \2', content, flags=re.DOTALL)
+        # 🧬 Split-Based Surgical Replacement
+        start_marker = f"<!-- ENTRY_START_{data.id} -->"
+        end_marker = f"<!-- ENTRY_END_{data.id} -->"
+        
+        if start_marker not in content or end_marker not in content:
+            return JSONResponse(status_code=404, content={"status": "error", "message": "Entry markers lost"})
+
+        prefix, remainder = content.split(start_marker)
+        entry_to_modify, suffix = remainder.split(end_marker)
+        
+        content_prefix = '<div class="content">'
+        parts = entry_to_modify.split(content_prefix)
+        
+        # Preserve the tail (closing divs) of the content region
+        # Structure: <div class="content"> [HTML] </div> </div>
+        # We find the tail starting from the last </div> </div>
+        tail_search = entry_to_modify.rfind('</div>')
+        second_last_div = entry_to_modify[:tail_search].rfind('</div>')
+        tail = entry_to_modify[second_last_div:]
+        
+        new_entry_block = parts[0] + content_prefix + f"\n                {data.html}\n            " + tail
+        new_content = prefix + start_marker + new_entry_block + end_marker + suffix
         
         with open(MASTER_FILE, 'w', encoding='utf-8') as f:
             f.write(new_content)
@@ -117,11 +136,17 @@ async def delete_entry(data: DeleteData):
     try:
         with open(MASTER_FILE, 'r', encoding='utf-8') as f:
             content = f.read()
+            
+        start_marker = f"<!-- ENTRY_START_{data.id} -->"
+        end_marker = f"<!-- ENTRY_END_{data.id} -->"
         
-        # Use unique ID markers for a clean, non-greedy delete that NEVER touches the marker
-        pattern = rf'<!-- ENTRY_START_{data.id} -->.*?<!-- ENTRY_END_{data.id} -->'
-        new_content = re.sub(pattern, '', content, flags=re.DOTALL)
+        if start_marker not in content:
+            return {"status": "success"}
+
+        prefix, remainder = content.split(start_marker)
+        _, suffix = remainder.split(end_marker)
         
+        new_content = prefix + suffix
         with open(MASTER_FILE, 'w', encoding='utf-8') as f:
             f.write(new_content)
         return {"status": "success"}

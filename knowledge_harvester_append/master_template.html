@@ -124,19 +124,27 @@
             border: 1px solid var(--border-color);
             border-radius: 4px;
             cursor: pointer;
-            padding: 4px 8px;
-            font-size: 14px;
+            padding: 6px 10px;
+            font-size: 16px;
             transition: all 0.2s;
             background: var(--bg-page);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .control-btn:hover {
             background: var(--inline-code-bg);
+            border-color: var(--text-secondary);
         }
 
         .save-btn {
             border-color: #10b981;
             color: #10b981;
+        }
+
+        .save-btn:hover {
+            background: #ecfdf5;
         }
 
         .delete-btn:hover {
@@ -161,9 +169,17 @@
 
         .editing {
             outline: 2px solid #3b82f6;
-            padding: 10px;
+            padding: 15px;
+            margin: -5px;
             border-radius: 8px;
             background: rgba(59, 130, 246, 0.05);
+            min-height: 50px;
+        }
+
+        .status-msg {
+            font-size: 12px;
+            margin-right: 10px;
+            display: none;
         }
     </style>
 </head>
@@ -193,44 +209,66 @@
             content.contentEditable = true;
             content.classList.add('editing');
             entry.querySelector('.edit-btn').style.display = 'none';
-            entry.querySelector('.save-btn').style.display = 'inline-block';
+            entry.querySelector('.save-btn').style.display = 'flex';
             content.focus();
         }
 
         async function saveEntry(id) {
             const entry = document.getElementById(id);
             const content = entry.querySelector('.content');
-            const newHtml = content.innerHTML;
+            const saveBtn = entry.querySelector('.save-btn');
+            const originalBtnText = saveBtn.innerHTML;
 
-            const response = await fetch('/update', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: id, html: newHtml })
-            });
+            saveBtn.innerHTML = '⏳';
+            saveBtn.disabled = true;
 
-            if (response.ok) {
-                content.contentEditable = false;
-                content.classList.remove('editing');
-                entry.querySelector('.edit-btn').style.display = 'inline-block';
-                entry.querySelector('.save-btn').style.display = 'none';
-            } else {
-                alert('Failed to save changes.');
+            try {
+                const newHtml = content.innerHTML;
+                const response = await fetch('/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: id, html: newHtml })
+                });
+
+                if (response.ok) {
+                    content.contentEditable = false;
+                    content.classList.remove('editing');
+                    entry.querySelector('.edit-btn').style.display = 'flex';
+                    saveBtn.style.display = 'none';
+                    saveBtn.innerHTML = originalBtnText;
+                    saveBtn.disabled = false;
+                } else {
+                    throw new Error('Save failed');
+                }
+            } catch (e) {
+                alert('❌ Error: Could not save changes back to file.');
+                saveBtn.innerHTML = originalBtnText;
+                saveBtn.disabled = false;
             }
         }
 
         async function deleteEntry(id) {
-            if (!confirm('Are you sure you want to delete this entry?')) return;
+            if (!confirm('🗑️ Delete this entry permanently from the log?')) return;
 
-            const response = await fetch('/delete', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: id })
-            });
+            try {
+                const response = await fetch('/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: id })
+                });
 
-            if (response.ok) {
-                document.getElementById(id).remove();
-            } else {
-                alert('Failed to delete entry.');
+                if (response.ok) {
+                    const entry = document.getElementById(id);
+                    entry.style.opacity = '0';
+                    entry.style.height = '0';
+                    entry.style.margin = '0';
+                    entry.style.padding = '0';
+                    setTimeout(() => entry.remove(), 300);
+                } else {
+                    alert('Failed to delete entry.');
+                }
+            } catch (e) {
+                alert('Error connecting to server.');
             }
         }
     </script>
