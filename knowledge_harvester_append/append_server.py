@@ -165,9 +165,42 @@ async def clear_log():
 
 @app.get("/view")
 async def view_master():
-    if MASTER_FILE.exists():
-        return FileResponse(MASTER_FILE)
-    return HTMLResponse("<h1>No captures yet.</h1>")
+    if not MASTER_FILE.exists():
+        return HTMLResponse("<h1>No captures yet.</h1>")
+    
+    try:
+        # Read the current log data
+        with open(MASTER_FILE, 'r', encoding='utf-8') as f:
+            log_content = f.read()
+        
+        # Extract the entries block
+        # We look for the first entry start or just the container content
+        if "<!-- ENTRY_START_" in log_content:
+            parts = log_content.split("<!-- ENTRY_START_")
+            # Keep everything from the first marker onwards until the end of the container
+            # Actually, let's just find the container content carefully
+            container_start = '<div class="container">'
+            container_end = '</div>' # Assuming last div is container end
+            
+            if container_start in log_content:
+                c_parts = log_content.split(container_start)
+                inner = c_parts[1].rsplit(container_end, 1)[0]
+                entries_html = inner.strip()
+            else:
+                entries_html = "<!-- APPEND_HERE -->"
+        else:
+            entries_html = "<!-- APPEND_HERE -->"
+
+        # Read the latest template
+        with open(TEMPLATE_FILE, 'r', encoding='utf-8') as f:
+            template_content = f.read()
+        
+        # Inject entries into the latest template UI
+        final_html = template_content.replace("{{CONTENT_PLACEHOLDER}}", entries_html)
+        
+        return HTMLResponse(final_html)
+    except Exception as e:
+        return HTMLResponse(f"<h1>Error rendering log: {str(e)}</h1>")
 
 if __name__ == "__main__":
     print("\n" + "="*60)
