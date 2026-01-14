@@ -42,11 +42,11 @@ def init_master_file():
                 f.write("<html><body><!-- APPEND_HERE --></body></html>")
 
 def append_to_master(new_html: str, source: str):
-    """Appends new content to the master file before the marker."""
-    init_master_file()
-    
+    # 1. Generate live timestamp
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    # Wrap new content with a separator and metadata
+    
+    # 2. Build the "Fidelity HTML Shell"
+    # We use the exact 50px/2px-dashed style you previously approved
     wrapped_content = f"""
     <div class="harvest-entry" style="margin-top: 50px; border-top: 2px dashed #374151; padding-top: 20px;">
         <div class="metadata" style="color: #9ca3af; font-size: 0.8em; margin-bottom: 10px;">
@@ -59,17 +59,17 @@ def append_to_master(new_html: str, source: str):
     <!-- APPEND_HERE -->
     """
     
-    with open(MASTER_FILE, 'r', encoding='utf-8') as f:
+    # 3. Read the master file
+    init_master_file()
+    with open("master_harvest.html", 'r', encoding='utf-8') as f:
         full_content = f.read()
     
-    if "<!-- APPEND_HERE -->" in full_content:
-        updated_content = full_content.replace("<!-- APPEND_HERE -->", wrapped_content)
-        with open(MASTER_FILE, 'w', encoding='utf-8') as f:
-            f.write(updated_content)
-    else:
-        # Emergency recovery if marker is lost
-        with open(MASTER_FILE, 'a', encoding='utf-8') as f:
-            f.write(wrapped_content)
+    # 4. Perform the "Surgical Append"
+    # We replace the invisible marker with our new styled content
+    updated_content = full_content.replace("<!-- APPEND_HERE -->", wrapped_content)
+    
+    with open("master_harvest.html", 'w', encoding='utf-8') as f:
+        f.write(updated_content)
 
 @app.post("/")
 async def capture(data: CaptureData):
