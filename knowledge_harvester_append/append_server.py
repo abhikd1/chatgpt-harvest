@@ -20,10 +20,19 @@ def get_groq_key():
     # Try local file
     key_file = Path("groq_key.txt")
     if key_file.exists():
-        return key_file.read_text().strip()
+        k = key_file.read_text().strip()
+        if k and not k.startswith("gsk_"):
+             print("⚠️ Warning: groq_key.txt does not look like a valid Groq key.")
+        return k
     return None
 
-groq_client = Groq(api_key=get_groq_key() or "PASTE_KEY_HERE")
+api_key = get_groq_key()
+if not api_key or api_key == "PASTE_KEY_HERE":
+    print("ERROR: No Groq API Key found. AI features will fail. Create groq_key.txt.")
+else:
+    print(f"Groq API Key loaded: {api_key[:10]}...")
+
+groq_client = Groq(api_key=api_key or "FAILED_KEY")
 
 app = FastAPI(title="ChatGPT Harvest - Editable Log")
 
@@ -54,30 +63,61 @@ class SummarizeData(BaseModel):
     system_prompt: str = "You are a research assistant. Provide a concise, 1-sentence TL;DR summary of the following content. Do not say 'Here is the summary' or use any fluff. Just the facts."
     user_prompt: str = ""
 
-MASTER_FILE = Path("master_harvest.html")
-TEMPLATE_FILE = Path("master_template.html")
-
-def generate_tldr(content: str, system_prompt: str = None, user_prompt: str = ""):
-    try:
-        if not system_prompt:
-            system_prompt = "Summarize this content in exactly one concise, punchy sentence. No fluff."
+async def generate_tldr(content: str, system_prompt: str = None, user_prompt: str = "", model="llama-3.3-70b-versatile"):
+    def _call_groq():
+        nonlocal system_prompt
+        try:
+            if not system_prompt:
+                system_prompt = "Summarize this content in exactly one concise, punchy sentence. No fluff."
+                
+            clean_text = re.sub(r'<[^>]*>', '', content)
+            prompt_content = f"{user_prompt}\n\nCONTENT:\n{clean_text[:4000]}" if user_prompt else clean_text[:4000]
             
-        # Strip HTML for cleaner processing
-        clean_text = re.sub(r'<[^>]*>', '', content)
-        
-        prompt_content = f"{user_prompt}\n\nCONTENT:\n{clean_text[:4000]}" if user_prompt else clean_text[:4000]
-        
-        response = groq_client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt_content}
-            ]
-        )
-        return response.choices[0].message.content.strip()
-    except Exception as e:
-        print(f"TL;DR Error: {e}")
-        return "AI Summary unavailable."
+            print(f"AI Request: Model={model}, PromptLen={len(prompt_content)}")
+            
+            response = groq_client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": prompt_content}
+                ],
+                timeout=45 # Increased timeout for deep reasoning
+            )
+            res = response.choices[0].message.content.strip()
+            print(f"AI Response Received ({len(res)} chars)")
+            return res
+        except Exception as e:
+            err_msg = f"Groq API Error: {type(e).__name__}: {e}"
+            print(f"Error: {err_msg}")
+            return f"Error: {str(e)}"
+
+    return await asyncio.to_thread(_call_groq)
+
+async def generate_deep_research_tldr(content: str, system_prompt: str = None, user_prompt: str = ""):
+    """
+    Implements the requested 2-step process:
+    1. LLaMA Deep Reasoning
+    2. Phi-3 Concise Explanation
+    """
+    print("DEEP RESEARCH: Starting Pipeline (2 Steps)")
+    start_time = datetime.now()
+    
+    # STEP 1: DEEP REASONING (LLaMA 70B)
+    reasoning_sys = "You are a Deep Reasoning Agent. Analyze the provided content. Identify key insights, technical nuances, and hidden connections. Output your expert reasoning internal monologue first."
+    print("DEEP RESEARCH: Step 1: LLaMA Deep Reasoning...")
+    reasoning = await generate_tldr(content, reasoning_sys, "Think deeply about this content. Extract the core logic.", model="llama-3.3-70b-versatile")
+    
+    # STEP 2: CONCISE EXPLANATION (Phi-3 Style)
+    explain_sys = system_prompt or "You are a sharp, concise editor. Provide a 1-sentence TL;DR based on the reasoning provided."
+    explain_user = f"{user_prompt}\n\nDEEP REASONING DATA:\n{reasoning}\n\nNow, provide the final punchy 1-sentence summary for the log."
+    print("DEEP RESEARCH: Step 2: Concise Explanation (Phi-3 Mode)...")
+    tldr = await generate_tldr(content, explain_sys, explain_user, model="llama3-8b-8192")
+    
+    end_time = datetime.now()
+    duration = (end_time - start_time).total_seconds()
+    print(f"DEEP RESEARCH: Complete in {duration:.1f}s")
+    
+    return tldr
 
 def init_master_file():
     """Ensures the master file exists and is structurally sound."""
@@ -179,13 +219,14 @@ async def update_file_tldr(entry_id: str, tldr: str):
         print(f"File update failed: {e}")
 
 async def process_tldr_and_update(entry_id: str, content: str, system_prompt: str = None, user_prompt: str = ""):
-    tldr = generate_tldr(content, system_prompt, user_prompt)
+    # Use the new Deep Research Pipeline for all captures
+    tldr = await generate_deep_research_tldr(content, system_prompt, user_prompt)
     await update_file_tldr(entry_id, tldr)
 
 @app.post("/summarize")
 async def summarize(data: SummarizeData):
     try:
-        tldr = generate_tldr(data.content, data.system_prompt, data.user_prompt)
+        tldr = await generate_deep_research_tldr(data.content, data.system_prompt, data.user_prompt)
         # Still update the file for persistence
         asyncio.create_task(update_file_tldr(data.id, tldr))
         return {"status": "success", "tldr": tldr}

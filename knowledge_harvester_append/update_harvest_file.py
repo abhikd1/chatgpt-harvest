@@ -17,7 +17,7 @@ if os.path.exists(MASTER_FILE):
         else:
             tldr_block = f"""
                 <div class="tldr-container" style="background: rgba(59, 130, 246, 0.05); border-left: 3px solid #3b82f6; padding: 10px 15px; margin-bottom: 15px; font-size: 13px; font-style: italic; color: var(--text-primary);">
-                    <strong>⚡ AI TL;DR:</strong> <span class="tldr-content" id="tldr-{eid}">Migration Note: Click 🤖 to generate summary.</span>
+                    <strong>⚡ AI TL;DR:</strong> <span class="tldr-content" id="tldr-{eid}">Migration Note: Click 🤖 to trigger Deep Research (LLaMA+Phi-3).</span>
                 </div>"""
             rest = tldr_block + rest
 
