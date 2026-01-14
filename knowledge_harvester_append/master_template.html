@@ -393,6 +393,45 @@
             border-color: #ef4444;
             color: #fca5a5;
         }
+
+        /* 📅 DIVIDER STYLES */
+        .log-divider {
+            display: flex;
+            align-items: center;
+            margin: 60px 0 30px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .log-divider::before,
+        .log-divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .log-divider span {
+            padding: 0 20px;
+            background: var(--bg-page);
+            position: relative;
+            top: -1px;
+        }
+
+        .view-mode-select {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            cursor: pointer;
+            outline: none;
+            font-family: var(--font-sans);
+        }
     </style>
 </head>
 
@@ -417,6 +456,11 @@
             MD</button>
         <button class="control-btn master-btn delete-btn" onclick="deleteAll()" title="Clear Entire Log">🗑️ Master
             Delete</button>
+        <select class="view-mode-select" id="view-mode" onchange="applyViewMode()">
+            <option value="default">Timeline</option>
+            <option value="date">By Date</option>
+            <option value="source">By Source</option>
+        </select>
         <button class="control-btn" style="border-radius:20px; font-size: 12px;" onclick="toggleTheme()">☀️/🌙</button>
     </div>
 
@@ -549,7 +593,72 @@
         }
 
         // Initialize on load
-        window.addEventListener('DOMContentLoaded', initSidebar);
+        window.addEventListener('DOMContentLoaded', () => {
+            initSidebar();
+            // Store original order
+            window.originalEntries = Array.from(document.querySelectorAll('.harvest-entry'));
+        });
+
+        function applyViewMode() {
+            const mode = document.getElementById('view-mode').value;
+            const container = document.querySelector('.container');
+            const entries = [...window.originalEntries];
+
+            // Clear current view
+            container.innerHTML = '<!-- APPEND_HERE -->';
+
+            if (mode === 'default') {
+                entries.forEach(e => container.insertBefore(e, container.firstChild));
+                generateIndex();
+                return;
+            }
+
+            const groups = {};
+            entries.forEach(entry => {
+                const metadata = entry.querySelector('.metadata').innerText;
+                let key = '';
+
+                if (mode === 'date') {
+                    const datePart = metadata.split('|')[0].replace('Captured on: ', '').split(' ')[0].trim();
+                    const today = new Date().toISOString().split('T')[0];
+                    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+
+                    if (datePart === today) key = 'Today';
+                    else if (datePart === yesterday) key = 'Yesterday';
+                    else key = datePart;
+                } else if (mode === 'source') {
+                    key = metadata.split('|')[1].replace('Source: ', '').trim();
+                }
+
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(entry);
+            });
+
+            // Sort keys (Date descending, Source alphabetical)
+            const sortedKeys = Object.keys(groups).sort((a, b) => {
+                if (mode === 'date') {
+                    if (a === 'Today') return -1;
+                    if (b === 'Today') return 1;
+                    if (a === 'Yesterday') return -1;
+                    if (b === 'Yesterday') return 1;
+                    return b.localeCompare(a);
+                }
+                return a.localeCompare(b);
+            });
+
+            sortedKeys.forEach(key => {
+                const divider = document.createElement('div');
+                divider.className = 'log-divider';
+                divider.innerHTML = `<span>${key}</span>`;
+                container.insertBefore(divider, container.firstChild);
+
+                groups[key].forEach(entry => {
+                    container.insertBefore(entry, container.firstChild);
+                });
+            });
+
+            generateIndex();
+        }
 
         async function copyAll() {
             const contents = Array.from(document.querySelectorAll('.content'));
