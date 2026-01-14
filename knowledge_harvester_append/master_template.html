@@ -176,17 +176,74 @@
             min-height: 50px;
         }
 
-        .status-msg {
-            font-size: 12px;
-            margin-right: 10px;
-            display: none;
+        /* 🔍 SEARCH HIGHLIGHTS */
+        .search-match {
+            background-color: #fef08a;
+            /* Soft yellow */
+            color: #000;
+            border-radius: 2px;
+            box-shadow: 0 0 0 1px #facc15;
+            transition: all 0.2s;
+        }
+
+        .search-match.current {
+            background-color: #fb923c;
+            /* Orange for active match */
+            box-shadow: 0 0 0 2px #f97316, 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            color: #fff;
+        }
+
+        .search-controls {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--code-bg);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .search-input {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 13px;
+            outline: none;
+            width: 150px;
+        }
+
+        .search-stat {
+            font-size: 11px;
+            color: var(--text-secondary);
+            min-width: 40px;
+        }
+
+        .search-nav-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 2px 5px;
+            font-size: 14px;
+            opacity: 0.6;
+        }
+
+        .search-nav-btn:hover {
+            opacity: 1;
         }
     </style>
 </head>
 
 <body>
     <div class="master-controls-bar"
-        style="position: sticky; top: 0; background: var(--bg-page); border-bottom: 1px solid var(--border-color); padding: 10px 0; z-index: 999; display: flex; justify-content: center; gap: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+        style="position: sticky; top: 0; background: var(--bg-page); border-bottom: 1px solid var(--border-color); padding: 10px 0; z-index: 999; display: flex; justify-content: center; align-items: center; gap: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+        <div class="search-controls">
+            <span>🔍</span>
+            <input type="text" id="search-input" class="search-input" placeholder="Search captures..."
+                oninput="handleSearchInput()">
+            <span id="search-count" class="search-stat">0/0</span>
+            <button class="search-nav-btn" onclick="navigateSearch(-1)">▲</button>
+            <button class="search-nav-btn" onclick="navigateSearch(1)">▼</button>
+        </div>
         <button class="control-btn master-btn" onclick="copyAll()" title="Copy All Captures">📋 Master Copy</button>
         <button class="control-btn master-btn" onclick="editAll()" title="Toggle Edit Mode for All">✏️ Master
             Edit</button>
@@ -307,6 +364,9 @@
             saveBtn.disabled = true;
 
             try {
+                // IMPORTANT: Strip search markers BEFORE saving
+                clearSearchMarkers(content);
+
                 const newHtml = content.innerHTML;
                 const response = await fetch('/update', {
                     method: 'POST',
@@ -357,6 +417,91 @@
                 alert('Error connecting to server.');
             }
         }
+
+        // 🔍 SEARCH SYSTEM LOGIC
+        let searchMatches = [];
+        let currentMatchIndex = -1;
+
+        function handleSearchInput() {
+            clearSearchMarkers(document.querySelector('.container'));
+            const keyword = document.getElementById('search-input').value.trim();
+            if (keyword.length < 2) {
+                updateSearchStat(0, 0);
+                return;
+            }
+
+            highlightText(document.querySelector('.container'), keyword);
+            searchMatches = Array.from(document.querySelectorAll('.search-match'));
+
+            if (searchMatches.length > 0) {
+                currentMatchIndex = 0;
+                updateSearchStat(1, searchMatches.length);
+                scrollToMatch(0);
+            } else {
+                updateSearchStat(0, 0);
+            }
+        }
+
+        function highlightText(element, keyword) {
+            const regex = new RegExp(`(${keyword})`, 'gi');
+            const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
+            const nodes = [];
+            while (walker.nextNode()) nodes.push(walker.currentNode);
+
+            nodes.forEach(node => {
+                const text = node.nodeValue;
+                if (regex.test(text)) {
+                    const span = document.createElement('span');
+                    span.innerHTML = text.replace(regex, '<mark class="search-match">$1</mark>');
+                    node.parentNode.replaceChild(span, node);
+                }
+            });
+        }
+
+        function clearSearchMarkers(root = document.body) {
+            const marks = root.querySelectorAll('.search-match');
+            marks.forEach(mark => {
+                const parent = mark.parentNode;
+                parent.replaceChild(document.createTextNode(mark.textContent), mark);
+                parent.normalize();
+
+                if (parent.tagName === 'SPAN' && parent.childNodes.length === 1 && parent.firstChild.nodeType === 3) {
+                    const grandParent = parent.parentNode;
+                    grandParent.replaceChild(parent.firstChild, parent);
+                    grandParent.normalize();
+                }
+            });
+            searchMatches = [];
+            currentMatchIndex = -1;
+        }
+
+        function navigateSearch(direction) {
+            if (searchMatches.length === 0) return;
+
+            searchMatches[currentMatchIndex]?.classList.remove('current');
+            currentMatchIndex = (currentMatchIndex + direction + searchMatches.length) % searchMatches.length;
+
+            updateSearchStat(currentMatchIndex + 1, searchMatches.length);
+            scrollToMatch(currentMatchIndex);
+        }
+
+        function scrollToMatch(index) {
+            const match = searchMatches[index];
+            if (!match) return;
+            match.classList.add('current');
+            match.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function updateSearchStat(current, total) {
+            document.getElementById('search-count').textContent = `${current}/${total}`;
+        }
+
+        document.getElementById('search-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                navigateSearch(e.shiftKey ? -1 : 1);
+            }
+        });
     </script>
 </body>
 
