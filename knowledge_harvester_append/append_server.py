@@ -9,6 +9,21 @@ from datetime import datetime
 from pathlib import Path
 import uvicorn
 import re
+from groq import Groq
+
+# GROQ_API_KEY = "gsk_..." # REDACTED FOR SECURITY
+def get_groq_key():
+    # Try environment variable first
+    key = os.getenv("GROQ_API_KEY")
+    if key: return key
+    
+    # Try local file
+    key_file = Path("groq_key.txt")
+    if key_file.exists():
+        return key_file.read_text().strip()
+    return None
+
+groq_client = Groq(api_key=get_groq_key() or "PASTE_KEY_HERE")
 
 app = FastAPI(title="ChatGPT Harvest - Editable Log")
 
@@ -33,8 +48,34 @@ class DeleteData(BaseModel):
 class BatchDeleteData(BaseModel):
     ids: list[str]
 
+class SummarizeData(BaseModel):
+    id: str
+    content: str
+    system_prompt: str = "You are a research assistant. Provide a concise, 1-sentence TL;DR summary of the following content. Do not say 'Here is the summary' or use any fluff. Just the facts."
+    user_prompt: str = ""
+
 MASTER_FILE = Path("master_harvest.html")
 TEMPLATE_FILE = Path("master_template.html")
+
+def generate_tldr(content: str, system_prompt: str = None):
+    try:
+        if not system_prompt:
+            system_prompt = "Summarize this content in exactly one concise, punchy sentence. No fluff."
+            
+        # Strip HTML for cleaner processing
+        clean_text = re.sub(r'<[^>]*>', '', content)
+        
+        response = groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": clean_text[:4000]} # Limit context
+            ]
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"TL;DR Error: {e}")
+        return "AI Summary unavailable."
 
 def init_master_file():
     """Ensures the master file exists and is structurally sound."""
@@ -66,8 +107,11 @@ def append_to_master(new_html: str, source: str):
                 <button onclick="saveEntry('{entry_id}')" class="control-btn save-btn" style="display:none;" title="Save">💾</button>
                 <button onclick="deleteEntry('{entry_id}')" class="control-btn delete-btn" title="Delete">🗑️</button>
             </div>
-            <div class="metadata" style="color: #9ca3af; font-size: 0.8em; margin-bottom: 10px;">
+            <div class="metadata" style="color: #9ca3af; font-size: 0.8em; margin-bottom: 5px;">
                 Captured on: {timestamp} | Source: {source}
+            </div>
+            <div class="tldr-container" style="background: rgba(59, 130, 246, 0.05); border-left: 3px solid #3b82f6; padding: 10px 15px; margin-bottom: 15px; font-size: 13px; font-style: italic; color: var(--text-primary);">
+                <strong>⚡ AI TL;DR:</strong> <span class="tldr-content" id="tldr-{entry_id}">Generating summary...</span>
             </div>
             <div class="content">
                 {new_html}
@@ -91,13 +135,40 @@ def append_to_master(new_html: str, source: str):
     updated_content = full_content.replace("<!-- APPEND_HERE -->", wrapped_content)
     with open(MASTER_FILE, 'w', encoding='utf-8') as f:
         f.write(updated_content)
+    return entry_id
 
 @app.post("/")
 async def capture(data: CaptureData):
-    loop = asyncio.get_event_loop()
     try:
-        await loop.run_in_executor(None, append_to_master, data.html, data.source)
-        return {"status": "success", "url": "http://localhost:8771/view"}
+        entry_id = append_to_master(data.html, data.source)
+        # Background task for TL;DR
+        asyncio.create_task(process_tldr_and_update(entry_id, data.html))
+        return {"status": "success", "url": "http://localhost:8771/view", "id": entry_id}
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
+
+async def process_tldr_and_update(entry_id: str, content: str, system_prompt: str = None):
+    tldr = generate_tldr(content, system_prompt)
+    try:
+        with open(MASTER_FILE, 'r', encoding='utf-8') as f:
+            file_content = f.read()
+        
+        target = f'id="tldr-{entry_id}">Generating summary...</span>'
+        replacement = f'id="tldr-{entry_id}">{tldr}</span>'
+        
+        updated_file = file_content.replace(target, replacement)
+        with open(MASTER_FILE, 'w', encoding='utf-8') as f:
+            f.write(updated_file)
+    except Exception as e:
+        print(f"Update TL;DR failed: {e}")
+
+@app.post("/summarize")
+async def summarize(data: SummarizeData):
+    try:
+        tldr = generate_tldr(data.content, data.system_prompt)
+        # Also update the master file
+        asyncio.create_task(process_tldr_and_update(data.id, data.content, data.system_prompt))
+        return {"status": "success", "tldr": tldr}
     except Exception as e:
         return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
 

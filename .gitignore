@@ -1,0 +1,4 @@
+knowledge_harvester_append/groq_key.txt
+__pycache__/
+*.pyc
+.env
