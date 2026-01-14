@@ -973,8 +973,15 @@
             const tldrSpan = entry.querySelector('.tldr-content');
 
             closeEntryAI(id);
-            tldrSpan.innerText = "⚡ Re-synthesizing...";
+            tldrSpan.innerText = "🧠 Step 1: LLaMA Reasoning (6-7 GB RAM)...";
             aiBtn.classList.add('processing');
+
+            // Logic for a bit of UX delays to show the steps
+            setTimeout(() => {
+                if (tldrSpan.innerText.includes("Step 1")) {
+                    tldrSpan.innerText = "🖋️ Step 2: Phi-3 Explanation (3-4 GB RAM)...";
+                }
+            }, 8000);
 
             try {
                 const sysPrompt = localStorage.getItem('aiSystemPrompt');
@@ -999,6 +1006,7 @@
             } catch (e) {
                 tldrSpan.innerText = "Connection error.";
             } finally {
+                aiBtn.classList.remove('processing');
             }
         }
 
@@ -1008,8 +1016,14 @@
             const content = entry.querySelector('.content').innerText;
             const tldrSpan = entry.querySelector('.tldr-content');
 
-            tldrSpan.innerText = "🧠 Deep Thinking Strategy...";
+            tldrSpan.innerText = "🧠 Step 1: LLaMA Reasoning (6-7 GB RAM)...";
             if (aiBtn) aiBtn.classList.add('processing');
+
+            setTimeout(() => {
+                if (tldrSpan.innerText.includes("Step 1")) {
+                    tldrSpan.innerText = "🖋️ Step 2: Phi-3 Explanation (3-4 GB RAM)...";
+                }
+            }, 8000);
 
             try {
                 const sysPrompt = localStorage.getItem('aiSystemPrompt');

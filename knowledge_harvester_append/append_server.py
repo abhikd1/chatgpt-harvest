@@ -9,6 +9,7 @@ from datetime import datetime
 from pathlib import Path
 import uvicorn
 import re
+import httpx
 from groq import Groq
 
 # GROQ_API_KEY = "gsk_..." # REDACTED FOR SECURITY
@@ -96,31 +97,65 @@ async def generate_tldr(content: str, system_prompt: str = None, user_prompt: st
 
     return await asyncio.to_thread(_call_groq)
 
+async def call_ollama(model: str, system_prompt: str, user_prompt: str):
+    """Hits the local Ollama API."""
+    url = "http://localhost:11434/api/generate"
+    prompt_content = f"System: {system_prompt}\nUser: {user_prompt}"
+    
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.post(url, json={
+                "model": model,
+                "prompt": prompt_content,
+                "stream": False,
+                "options": {"temperature": 0.3}
+            })
+            if response.status_code == 200:
+                res = response.json().get("response", "").strip()
+                return res
+            return None
+    except Exception as e:
+        print(f"Ollama Connection Error ({model}): {e}")
+        return None
+
 async def generate_deep_research_tldr(content: str, system_prompt: str = None, user_prompt: str = ""):
     """
-    Implements the requested 2-step process:
-    1. LLaMA Deep Reasoning
-    2. Phi-3 Concise Explanation
+    Implements the requested 2-step process optimized for a normal laptop:
+    Step 1: LLaMA Deep Reasoning (~6-7 GB RAM)
+    Step 2: Phi-3 Explanation (~3-4 GB RAM)
     """
-    print("DEEP RESEARCH: Starting Pipeline (2 Steps)")
+    print("\n--- DEEP RESEARCH MISSION (LOCAL OLLAMA) ---")
     start_time = datetime.now()
+    clean_text = re.sub(r'<[^>]*>', '', content)[:4000]
     
-    # STEP 1: DEEP REASONING (LLaMA 70B)
-    reasoning_sys = "You are a Deep Reasoning Agent. Analyze the provided content. Identify key insights, technical nuances, and hidden connections. Output your expert reasoning internal monologue first."
-    print("DEEP RESEARCH: Step 1: LLaMA Deep Reasoning...")
-    reasoning = await generate_tldr(content, reasoning_sys, "Think deeply about this content. Extract the core logic.", model="llama-3.3-70b-versatile")
+    # STEP 1: LLaMA Deep Reasoning (Targeting llama3.1)
+    print("STEP 1: LLaMA Deep Reasoning [LOAD: ~7GB RAM]...")
+    reasoning_sys = "You are a Deep Reasoning Agent. Think step-by-step. Analyze the core logic and technical nuances. Output your thought process first."
     
-    # STEP 2: CONCISE EXPLANATION (Phi-3 Style)
-    explain_sys = system_prompt or "You are a sharp, concise editor. Provide a 1-sentence TL;DR based on the reasoning provided."
-    explain_user = f"{user_prompt}\n\nDEEP REASONING DATA:\n{reasoning}\n\nNow, provide the final punchy 1-sentence summary for the log."
-    print("DEEP RESEARCH: Step 2: Concise Explanation (Llama 3.1 Mode)...")
-    tldr = await generate_tldr(content, explain_sys, explain_user, model="llama-3.1-8b-instant")
+    # Try Ollama first, fallback to Groq
+    tldr_reasoning = await call_ollama("llama3.1", reasoning_sys, clean_text)
+    
+    if not tldr_reasoning:
+        print("Fallback: Using Groq for Step 1...")
+        tldr_reasoning = await generate_tldr(content, reasoning_sys, "Extract core logic.", model="llama-3.3-70b-versatile")
+
+    # STEP 2: Phi-3 Explanation (Targeting phi3:mini)
+    print("STEP 2: Phi-3 Explanation [LOAD: ~4GB RAM]...")
+    explain_sys = system_prompt or "Provide a punchy 1-sentence TL;DR based on the reasoning provided."
+    explain_user = f"REASONING:\n{tldr_reasoning}\n\nCONTENT:\n{clean_text}\n\nFinal 1-sentence summary:"
+    
+    tldr_final = await call_ollama("phi3:mini", explain_sys, explain_user)
+    
+    if not tldr_final:
+        print("Fallback: Using Groq for Step 2...")
+        tldr_final = await generate_tldr(content, explain_sys, explain_user, model="llama-3.1-8b-instant")
     
     end_time = datetime.now()
     duration = (end_time - start_time).total_seconds()
-    print(f"DEEP RESEARCH: Complete in {duration:.1f}s")
+    print(f"RESEARCH MISSION COMPLETE: {duration:.1f}s [TOTAL LOAD: ~11GB RAM]")
+    print("-------------------------------------------\n")
     
-    return tldr
+    return tldr_final
 
 def init_master_file():
     """Ensures the master file exists and is structurally sound."""
