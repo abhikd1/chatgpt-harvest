@@ -21,9 +21,12 @@ if os.path.exists(MASTER_FILE):
                 </div>"""
             rest = tldr_block + rest
 
-        # Inject AI Button if missing
+        # Inject AI Button if missing and fix opacity
         if 'openEntryAI' not in meta_block:
             meta_block = meta_block.replace('<button onclick="deleteEntry', f'<button onclick="openEntryAI(\'{eid}\')" class="control-btn ai-btn" title="AI Process">🤖</button>\n                <button onclick="deleteEntry')
+        
+        # Increase visibility
+        meta_block = meta_block.replace('opacity: 0.2', 'opacity: 0.8').replace('this.style.opacity=0.2', 'this.style.opacity=0.8')
         
         return f'<!-- ENTRY_START_{eid} -->{meta_block}{rest}'
 

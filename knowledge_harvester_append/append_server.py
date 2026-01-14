@@ -145,7 +145,7 @@ def append_to_master(new_html: str, source: str):
     wrapped_content = f"""
         <!-- ENTRY_START_{entry_id} -->
         <div class="harvest-entry" id="{entry_id}" style="margin-top: 50px; border-top: 2px dashed #374151; padding-top: 20px; position: relative;">
-            <div class="entry-controls" style="position: absolute; top: 10px; right: 0; display: flex; gap: 10px; align-items: center; opacity: 0.2; transition: opacity 0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.2">
+            <div class="entry-controls" style="position: absolute; top: 10px; right: 0; display: flex; gap: 10px; align-items: center; opacity: 0.8; transition: opacity 0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8">
                 <input type="checkbox" class="entry-select" data-id="{entry_id}" onchange="refreshBatchUI()" style="width: 18px; height: 18px; cursor: pointer; margin-right: 10px;">
                 <button onclick="copyEntry('{entry_id}')" class="control-btn copy-btn" title="Copy">📋</button>
                 <button onclick="editEntry('{entry_id}')" class="control-btn edit-btn" title="Edit">✏️</button>

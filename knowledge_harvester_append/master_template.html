@@ -994,28 +994,26 @@
                     tldrSpan.innerText = data.tldr;
                     generateIndex(); // Refresh sidebar to show new TL;DR
                 } else {
-                    tldrSpan.innerText = "Generation failed.";
+                    tldrSpan.innerText = "AI Reasoning failed.";
                 }
             } catch (e) {
                 tldrSpan.innerText = "Connection error.";
             } finally {
-                aiBtn.classList.remove('processing');
             }
         }
 
         async function regenerateTLDR(id) {
-            // Re-use the process Entry AI logic with no user prompt
             const entry = document.getElementById(id);
             const aiBtn = entry.querySelector('.ai-btn');
             const content = entry.querySelector('.content').innerText;
             const tldrSpan = entry.querySelector('.tldr-content');
 
-            tldrSpan.innerText = "⚡ Re-synthesizing...";
+            tldrSpan.innerText = "🧠 Deep Thinking Strategy...";
             if (aiBtn) aiBtn.classList.add('processing');
 
             try {
                 const sysPrompt = localStorage.getItem('aiSystemPrompt');
-                await fetch('/summarize', {
+                const response = await fetch('/summarize', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1024,8 +1022,18 @@
                         system_prompt: sysPrompt
                     })
                 });
-            } catch (e) { } finally {
-                if (aiBtn) setTimeout(() => aiBtn.classList.remove('processing'), 3000);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    tldrSpan.innerText = data.tldr;
+                    generateIndex(); // Refresh sidebar to show new TL;DR
+                } else {
+                    tldrSpan.innerText = "Deep Thinking interrupted. Try again.";
+                }
+            } catch (e) {
+                tldrSpan.innerText = "Connection lost. AI is offline.";
+            } finally {
+                if (aiBtn) aiBtn.classList.remove('processing');
             }
         }
 
