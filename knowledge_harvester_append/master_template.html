@@ -433,12 +433,15 @@
 
     <div class="batch-selection-bar" id="batch-bar">
         <span class="batch-stat-count" id="batch-count">0 Selected</span>
-        <button class="batch-action-btn" onclick="copySelected()"><span style="font-size:1.2em;">📋</span> Copy
-            Selected</button>
-        <button class="batch-action-btn" onclick="exportSelectedMD()"><span style="font-size:1.2em;">📝</span> Export
+        <button class="batch-action-btn" id="batch-edit-btn" onclick="toggleEditSelected()"><span
+                style="font-size:1.2em;">✏️</span> Edit Selected</button>
+        <button class="batch-action-btn" onclick="copySelected()"><span style="font-size:1.2em;">📋</span> Copy</button>
+        <button class="batch-action-btn" onclick="downloadSelectedHTML()"><span style="font-size:1.2em;">📥</span>
+            Download HTML</button>
+        <button class="batch-action-btn" onclick="exportSelectedMD()"><span style="font-size:1.2em;">📝</span>
             MD</button>
         <button class="batch-action-btn batch-delete-btn" onclick="deleteSelectedBatch()"><span
-                style="font-size:1.2em;">🗑️</span> Delete Selected</button>
+                style="font-size:1.2em;">🗑️</span> Delete</button>
         <button class="batch-action-btn" onclick="clearSelection()" style="border:none; opacity:0.6;">✕</button>
     </div>
 
@@ -854,6 +857,8 @@
         });
 
         // 📦 BATCH SELECTION LOGIC
+        let isBatchEditing = false;
+
         function refreshBatchUI() {
             const selected = document.querySelectorAll('.entry-select:checked');
             const bar = document.getElementById('batch-bar');
@@ -867,8 +872,43 @@
             }
         }
 
+        async function toggleEditSelected() {
+            const selected = getSelectedEntries();
+            const btn = document.getElementById('batch-edit-btn');
+
+            if (isBatchEditing) {
+                // SAVE BATCH
+                btn.innerHTML = '⏳ Saving...';
+                for (let s of selected) {
+                    await saveEntry(s.id, true);
+                }
+                isBatchEditing = false;
+                btn.innerHTML = '<span style="font-size:1.2em;">✏️</span> Edit Selected';
+                btn.style.borderColor = '';
+                generateIndex();
+                alert('✅ Selected items saved!');
+            } else {
+                // EDIT BATCH
+                isBatchEditing = true;
+                selected.forEach(s => {
+                    s.content.contentEditable = true;
+                    s.content.classList.add('editing');
+                    const entry = document.getElementById(s.id);
+                    entry.querySelector('.edit-btn').style.display = 'none';
+                    entry.querySelector('.copy-btn').style.display = 'none';
+                    entry.querySelector('.save-btn').style.display = 'flex';
+                });
+                btn.innerHTML = '<span style="font-size:1.2em;">💾</span> Save Selected';
+                btn.style.borderColor = '#10b981';
+            }
+        }
+
         function clearSelection() {
             document.querySelectorAll('.entry-select').forEach(cb => cb.checked = false);
+            isBatchEditing = false;
+            const btn = document.getElementById('batch-edit-btn');
+            btn.innerHTML = '<span style="font-size:1.2em;">✏️</span> Edit Selected';
+            btn.style.borderColor = '';
             refreshBatchUI();
         }
 
@@ -879,9 +919,24 @@
                 return {
                     id: entry.id,
                     content: entry.querySelector('.content'),
-                    metadata: entry.querySelector('.metadata').innerText
+                    metadata: entry.querySelector('.metadata').innerText,
+                    html: entry.outerHTML
                 };
             });
+        }
+
+        async function downloadSelectedHTML() {
+            const selected = getSelectedEntries();
+            const combined = selected.map(s => s.html).join('\n');
+            const template = document.documentElement.outerHTML.split('<div class="container">')[0] +
+                '<div class="container">\n' + combined + '\n</div>\n</body>\n</html>';
+
+            const blob = new Blob([template], { type: 'text/html' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.download = `harvest_batch_${new Date().getTime()}.html`;
+            a.href = url;
+            a.click();
         }
 
         async function copySelected() {
