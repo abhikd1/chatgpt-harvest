@@ -990,15 +990,16 @@
                 });
 
                 if (response.ok) {
-                    tldrSpan.innerText = "⚡ AI is thinking...";
+                    const data = await response.json();
+                    tldrSpan.innerText = data.tldr;
+                    generateIndex(); // Refresh sidebar to show new TL;DR
+                } else {
+                    tldrSpan.innerText = "Generation failed.";
                 }
             } catch (e) {
-                tldrSpan.innerText = "Generation failed.";
+                tldrSpan.innerText = "Connection error.";
             } finally {
-                // We'll remove processing class after a few seconds or when the DOM is updated by poller
-                // Since this server-side updates the file, the page might need a refresh or we can poll
-                // For now, let's just pulse for 3 seconds as a "hint"
-                setTimeout(() => aiBtn.classList.remove('processing'), 3000);
+                aiBtn.classList.remove('processing');
             }
         }
 

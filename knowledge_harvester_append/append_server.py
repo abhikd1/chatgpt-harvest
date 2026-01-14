@@ -140,6 +140,9 @@ def append_to_master(new_html: str, source: str):
         f.write(updated_content)
     return entry_id
 
+# Global lock for file operations to prevent race conditions
+file_lock = asyncio.Lock()
+
 @app.post("/")
 async def capture(data: CaptureData):
     try:
@@ -150,38 +153,42 @@ async def capture(data: CaptureData):
     except Exception as e:
         return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
 
+async def update_file_tldr(entry_id: str, tldr: str):
+    # This just updates the file, doesn't need to generate anything
+    try:
+        async with file_lock: 
+            with open(MASTER_FILE, 'r', encoding='utf-8') as f:
+                file_content = f.read()
+            
+            start_marker = f"<!-- ENTRY_START_{entry_id} -->"
+            if start_marker not in file_content: return
+            
+            prefix, remainder = file_content.split(start_marker)
+            entry_parts = remainder.split(f"<!-- ENTRY_END_{entry_id} -->")
+            if len(entry_parts) < 2: return
+            entry_block, suffix = entry_parts[0], entry_parts[1]
+            
+            pattern = rf'id="tldr-{entry_id}">.*?</span>'
+            replacement = f'id="tldr-{entry_id}">{tldr}</span>'
+            new_entry_block = re.sub(pattern, replacement, entry_block, flags=re.DOTALL)
+            
+            updated_file = prefix + start_marker + new_entry_block + f"<!-- ENTRY_END_{entry_id} -->" + suffix
+            with open(MASTER_FILE, 'w', encoding='utf-8') as f:
+                f.write(updated_file)
+    except Exception as e:
+        print(f"File update failed: {e}")
+
 async def process_tldr_and_update(entry_id: str, content: str, system_prompt: str = None, user_prompt: str = ""):
     tldr = generate_tldr(content, system_prompt, user_prompt)
-    try:
-        with open(MASTER_FILE, 'r', encoding='utf-8') as f:
-            file_content = f.read()
-        
-        # Surgical replacement of the tldr span
-        # Find start of entry, then look for the specific tldr span
-        start_marker = f"<!-- ENTRY_START_{entry_id} -->"
-        if start_marker not in file_content: return
-        
-        prefix, remainder = file_content.split(start_marker)
-        entry_block, suffix = remainder.split(f"<!-- ENTRY_END_{entry_id} -->")
-        
-        # Replace the tldr span content
-        # <span class="tldr-content" id="tldr-UUID">OLD</span>
-        pattern = rf'id="tldr-{entry_id}">.*?</span>'
-        replacement = f'id="tldr-{entry_id}">{tldr}</span>'
-        new_entry_block = re.sub(pattern, replacement, entry_block, flags=re.DOTALL)
-        
-        updated_file = prefix + start_marker + new_entry_block + f"<!-- ENTRY_END_{entry_id} -->" + suffix
-        with open(MASTER_FILE, 'w', encoding='utf-8') as f:
-            f.write(updated_file)
-    except Exception as e:
-        print(f"Update TL;DR failed: {e}")
+    await update_file_tldr(entry_id, tldr)
 
 @app.post("/summarize")
 async def summarize(data: SummarizeData):
     try:
-        # Background task
-        asyncio.create_task(process_tldr_and_update(data.id, data.content, data.system_prompt, data.user_prompt))
-        return {"status": "success", "message": "Processing..."}
+        tldr = generate_tldr(data.content, data.system_prompt, data.user_prompt)
+        # Still update the file for persistence
+        asyncio.create_task(update_file_tldr(data.id, tldr))
+        return {"status": "success", "tldr": tldr}
     except Exception as e:
         return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
 
