@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lossless Capture Viewer</title>
+    <script>
+        // CRITICAL: Load theme BEFORE render to prevent FOUC
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <style>
+        /* 
+           🎨 CHATGPT VISUAL FIDELITY SCHEMA (STRICT)
+           Implementation of the 1:1 Engineering Reference
+        */
+
+        :root {
+            /* 1. COLORS (LIGHT MODE BY DEFAULT) */
+            --bg-page: #ffffff;
+            --text-primary: #0d0d0d;
+            --text-secondary: #6b7280;
+            --code-bg: #f9fafb;
+            --code-text: #111827;
+            --inline-code-bg: #f3f4f6;
+            --border-color: #e5e7eb;
+
+            /* 2. FONTS (MOST IMPORTANT) */
+            --font-sans: "Söhne", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        /* Support for Dark Mode via Toggle */
+        html[data-theme="dark"] {
+            --bg-page: #0f0f10;
+            --text-primary: #e5e7eb;
+            --text-secondary: #9ca3af;
+            --code-bg: #111827;
+            --code-text: #e5e7eb;
+            --inline-code-bg: #1f2937;
+            --border-color: #374151;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 16px;
+            /* SCHEMA: 16px */
+            line-height: 1.75;
+            /* SCHEMA: 1.75 (CRITICAL FOR SPACING) */
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 48rem;
+            margin: 0 auto;
+            padding: 4rem 1.5rem;
+            min-height: 100vh;
+        }
+
+        /* 3. TYPOGRAPHY & SPACING */
+        p,
+        ul,
+        ol,
+        blockquote,
+        table,
+        pre {
+            margin-bottom: 1.5rem;
+            /* Better flow spacing */
+        }
+
+        /* SCHEMA: Headings are same size as body, 600 weight */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        strong {
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.75;
+            color: var(--text-primary);
+        }
+
+        /* 4. CODE BLOCKS - THE BIGGEST ISSUE BLOCK */
+        pre {
+            background-color: var(--code-bg) !important;
+            color: var(--code-text) !important;
+            padding: 12px 14px;
+            /* SCHEMA: 12px 14px */
+            border-radius: 8px;
+            /* SCHEMA: 8px */
+            font-family: var(--font-mono);
+            font-size: 14px;
+            /* SCHEMA: 14px */
+            line-height: 1.6;
+            /* SCHEMA: 1.6 */
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: inherit;
+        }
+
+        /* Inline Code */
+        :not(pre)>code {
+            background-color: var(--inline-code-bg);
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+
+        /* Syntax Highlighting Adjustment */
+        html[data-theme="dark"] .mtk3 {
+            color: #93c5fd;
+        }
+
+        html[data-theme="dark"] .mtk5 {
+            color: #86efac;
+        }
+
+        /* Light Mode Default Syntax (Matching GPT Light) */
+        .mtk1 {
+            color: var(--text-primary);
+        }
+
+        .mtk3 {
+            color: #2563eb;
+        }
+
+        /* Keywords (Blue) */
+        .mtk5 {
+            color: #16a34a;
+        }
+
+        /* Strings (Green) */
+        .mtk8 {
+            color: #6b7280;
+        }
+
+        /* Comments */
+        .mtk6 {
+            color: #d97706;
+        }
+
+        /* Numbers */
+        .mtk11 {
+            color: #7c3aed;
+        }
+
+        /* Functions */
+
+        /* 6. TABLES - MINIMAL & FLAT */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            border: 1px solid var(--border-color);
+        }
+
+        th,
+        td {
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        /* Metadata & Controls */
+        .metadata {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 8px 16px;
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-family: var(--font-sans);
+            font-size: 0.8em;
+            z-index: 1000;
+        }
+    </style>
+</head>
+
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">☀️ / 🌙</button>
+
+    <div class="container">
+        <!-- Content will be injected here -->
+        {{CONTENT_PLACEHOLDER}}
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            if (current === 'dark') {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Load saved theme
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+</body>
+
+</html>
