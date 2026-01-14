@@ -63,6 +63,9 @@ class SummarizeData(BaseModel):
     system_prompt: str = "You are a research assistant. Provide a concise, 1-sentence TL;DR summary of the following content. Do not say 'Here is the summary' or use any fluff. Just the facts."
     user_prompt: str = ""
 
+MASTER_FILE = Path("master_harvest.html")
+TEMPLATE_FILE = Path("master_template.html")
+
 async def generate_tldr(content: str, system_prompt: str = None, user_prompt: str = "", model="llama-3.3-70b-versatile"):
     def _call_groq():
         nonlocal system_prompt
