@@ -147,6 +147,11 @@
             background: #ecfdf5;
         }
 
+        .copy-btn:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
         .delete-btn:hover {
             border-color: #ef4444;
             background: #fee2e2;
@@ -275,6 +280,24 @@
             }
         }
 
+        async function copyEntry(id) {
+            const entry = document.getElementById(id);
+            const content = entry.querySelector('.content');
+            const blob = new Blob([content.innerHTML], { type: 'text/html' });
+            const data = [new ClipboardItem({ 'text/html': blob })];
+
+            try {
+                await navigator.clipboard.write(data);
+                const btn = entry.querySelector('.copy-btn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '✅';
+                setTimeout(() => btn.innerHTML = originalText, 1000);
+            } catch (err) {
+                await navigator.clipboard.writeText(content.innerText);
+                alert('✅ Text copied!');
+            }
+        }
+
         let isEditingAll = false;
         async function editAll() {
             const masterEditBtn = document.querySelector('button[onclick="editAll()"]');
@@ -303,6 +326,7 @@
                 });
                 document.querySelectorAll('.harvest-entry').forEach(entry => {
                     entry.querySelector('.edit-btn').style.display = 'none';
+                    entry.querySelector('.copy-btn').style.display = 'none';
                     entry.querySelector('.save-btn').style.display = 'flex';
                 });
                 masterEditBtn.innerHTML = '💾 Master Save';

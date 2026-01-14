@@ -57,6 +57,7 @@ def append_to_master(new_html: str, source: str):
         <!-- ENTRY_START_{entry_id} -->
         <div class="harvest-entry" id="{entry_id}" style="margin-top: 50px; border-top: 2px dashed #374151; padding-top: 20px; position: relative;">
             <div class="entry-controls" style="position: absolute; top: 10px; right: 0; display: flex; gap: 10px; opacity: 0.2; transition: opacity 0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.2">
+                <button onclick="copyEntry('{entry_id}')" class="control-btn copy-btn" title="Copy">📋</button>
                 <button onclick="editEntry('{entry_id}')" class="control-btn edit-btn" title="Edit">✏️</button>
                 <button onclick="saveEntry('{entry_id}')" class="control-btn save-btn" style="display:none;" title="Save">💾</button>
                 <button onclick="deleteEntry('{entry_id}')" class="control-btn delete-btn" title="Delete">🗑️</button>
