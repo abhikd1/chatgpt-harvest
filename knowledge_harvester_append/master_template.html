@@ -185,12 +185,96 @@
 </head>
 
 <body>
-    <button class="theme-toggle" onclick="toggleTheme()">☀️ / 🌙</button>
+    <div class="master-controls-bar"
+        style="position: sticky; top: 0; background: var(--bg-page); border-bottom: 1px solid var(--border-color); padding: 10px 0; z-index: 999; display: flex; justify-content: center; gap: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+        <button class="control-btn master-btn" onclick="copyAll()" title="Copy All Captures">📋 Master Copy</button>
+        <button class="control-btn master-btn" onclick="editAll()" title="Toggle Edit Mode for All">✏️ Master
+            Edit</button>
+        <button class="control-btn master-btn" onclick="downloadLog()" title="Save Log as HTML">📥 Download Log</button>
+        <button class="control-btn master-btn delete-btn" onclick="deleteAll()" title="Clear Entire Log">🗑️ Master
+            Delete</button>
+        <button class="control-btn" style="border-radius:20px; font-size: 12px;" onclick="toggleTheme()">☀️/🌙</button>
+    </div>
+
     <div class="container">
         {{CONTENT_PLACEHOLDER}}
     </div>
 
     <script>
+        async function copyAll() {
+            const contents = Array.from(document.querySelectorAll('.content'));
+            const combinedHtml = contents.map(c => c.innerHTML).join('<hr style="margin: 40px 0; border: 1px dashed #ccc;">');
+
+            const blob = new Blob([combinedHtml], { type: 'text/html' });
+            const data = [new ClipboardItem({ 'text/html': blob })];
+
+            try {
+                await navigator.clipboard.write(data);
+                alert('✨ All captures copied to clipboard!');
+            } catch (err) {
+                const text = combinedHtml.replace(/<[^>]*>/g, '');
+                await navigator.clipboard.writeText(text);
+                alert('✅ Text copied!');
+            }
+        }
+
+        let isEditingAll = false;
+        async function editAll() {
+            const masterEditBtn = document.querySelector('button[onclick="editAll()"]');
+
+            if (isEditingAll) {
+                // WE ARE SAVING
+                const editingEntries = document.querySelectorAll('.content.editing');
+                if (editingEntries.length > 0) {
+                    masterEditBtn.innerHTML = '⏳ Saving...';
+                    for (let content of editingEntries) {
+                        const id = content.closest('.harvest-entry').id;
+                        await saveEntry(id, true); // true = silent mode
+                    }
+                }
+                isEditingAll = false;
+                masterEditBtn.innerHTML = '✏️ Master Edit';
+                masterEditBtn.style.borderColor = '';
+                alert('✅ All changes committed to file!');
+            } else {
+                // WE ARE OPENING EDIT MODE
+                isEditingAll = true;
+                const contents = document.querySelectorAll('.content');
+                contents.forEach(c => {
+                    c.contentEditable = true;
+                    c.classList.add('editing');
+                });
+                document.querySelectorAll('.harvest-entry').forEach(entry => {
+                    entry.querySelector('.edit-btn').style.display = 'none';
+                    entry.querySelector('.save-btn').style.display = 'flex';
+                });
+                masterEditBtn.innerHTML = '💾 Master Save';
+                masterEditBtn.style.borderColor = '#3b82f6';
+            }
+        }
+
+        async function downloadLog() {
+            const name = prompt("Name your harvest log:", "my_ai_harvest");
+            if (!name) return;
+            const filename = name.endsWith('.html') ? name : name + '.html';
+
+            const resp = await fetch('/view');
+            const blob = await resp.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        async function deleteAll() {
+            if (!confirm('🚨 DELETE ENTIRE LOG PERMANENTLY?')) return;
+            const response = await fetch('/clear', { method: 'POST' });
+            if (response.ok) window.location.reload();
+        }
         function toggleTheme() {
             const html = document.documentElement;
             const current = html.getAttribute('data-theme');
@@ -213,7 +297,7 @@
             content.focus();
         }
 
-        async function saveEntry(id) {
+        async function saveEntry(id, silent = false) {
             const entry = document.getElementById(id);
             const content = entry.querySelector('.content');
             const saveBtn = entry.querySelector('.save-btn');
@@ -237,13 +321,15 @@
                     saveBtn.style.display = 'none';
                     saveBtn.innerHTML = originalBtnText;
                     saveBtn.disabled = false;
+                    if (!silent) alert('✅ Saved!');
                 } else {
                     throw new Error('Save failed');
                 }
             } catch (e) {
-                alert('❌ Error: Could not save changes back to file.');
+                if (!silent) alert('❌ Error: Could not save changes back to file.');
                 saveBtn.innerHTML = originalBtnText;
                 saveBtn.disabled = false;
+                throw e;
             }
         }
 

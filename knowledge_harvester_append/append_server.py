@@ -153,6 +153,16 @@ async def delete_entry(data: DeleteData):
     except Exception as e:
         return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
 
+@app.post("/clear")
+async def clear_log():
+    try:
+        if MASTER_FILE.exists():
+            os.remove(MASTER_FILE)
+        init_master_file()
+        return {"status": "success"}
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
+
 @app.get("/view")
 async def view_master():
     if MASTER_FILE.exists():
