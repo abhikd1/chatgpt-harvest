@@ -158,6 +158,35 @@
             background: #fee2e2;
         }
 
+        .ai-btn:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .ai-btn.processing {
+            animation: pulse-ai 1.5s infinite;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        @keyframes pulse-ai {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
         .theme-toggle {
             position: fixed;
             top: 1rem;
@@ -269,6 +298,53 @@
             margin: 15px 0;
             outline: none;
             resize: none;
+        }
+
+        /* 🤖 AI ENTRY POPOVER */
+        .ai-entry-popover {
+            display: none;
+            position: absolute;
+            top: 45px;
+            right: 0;
+            background: var(--bg-page);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            z-index: 1002;
+            width: 280px;
+            flex-direction: column;
+            gap: 8px;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .ai-inner-input {
+            width: 100%;
+            padding: 8px 12px;
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+        }
+
+        .ai-btn-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 5px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* 🔍 SEARCH HIGHLIGHTS */
@@ -612,14 +688,35 @@
 
     <!-- AI Modal -->
     <div class="ai-modal" id="ai-modal">
-        <div class="ai-modal-content">
-            <h3 style="margin-bottom:10px;">🤖 AI Summarizer Settings</h3>
-            <p style="font-size:12px; color:var(--text-secondary);">Define the system prompt for your automated TL;DR
-                summaries. These appear in the sidebar and log entries.</p>
-            <textarea id="ai-system-prompt" class="ai-prompt-area" placeholder="System prompt..."></textarea>
-            <div style="display:flex; justify-content: flex-end; gap:10px;">
-                <button class="control-btn" onclick="closeAIModal()">Cancel</button>
-                <button class="control-btn save-btn" onclick="saveAISettings()">Save Settings</button>
+        <div class="ai-modal-content" style="width: 550px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="margin: 0;">🤖 AI Research Commander</h3>
+                <button class="control-btn" onclick="closeAIModal()">✕</button>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <label
+                    style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-secondary);">Global
+                    System Prompt</label>
+                <textarea id="ai-system-prompt" class="ai-prompt-area" placeholder="System prompt..."></textarea>
+            </div>
+
+            <div style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                <label
+                    style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-secondary);">Master
+                    Batch User Prompt (Optional)</label>
+                <input type="text" id="ai-master-user-prompt" class="ai-inner-input" style="margin-top:10px;"
+                    placeholder="Apply this custom instruction to ALL entries...">
+                <div style="margin-top: 15px; display:flex; justify-content: space-between; align-items:center;">
+                    <div style="font-size:10px; color:var(--text-secondary);">⚠️ This will process every entry in the
+                        file.</div>
+                    <button class="control-btn" style="background:#3b82f6; color:#fff; border-color:#2563eb;"
+                        onclick="processMasterAI()">🚀 Process All Entries</button>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; display:flex; justify-content: flex-end; gap:10px;">
+                <button class="control-btn save-btn" onclick="saveAISettings()">💾 Save Defaults</button>
             </div>
         </div>
     </div>
@@ -783,7 +880,7 @@
             applyDisplaySettings();
         });
 
-        // 🤖 AI SETTINGS LOGIC
+        // 🤖 AI SETTINGS & MASTER LOGIC
         function openAIModal() {
             document.getElementById('ai-modal').style.display = 'flex';
         }
@@ -795,17 +892,89 @@
         function saveAISettings() {
             const prompt = document.getElementById('ai-system-prompt').value;
             localStorage.setItem('aiSystemPrompt', prompt);
-            closeAIModal();
-            alert('🤖 AI Settings Saved! Future captures and regenerations will use this prompt.');
+            alert('🤖 AI Defaults Saved!');
         }
 
-        async function regenerateTLDR(id) {
+        async function processMasterAI() {
+            const systemPrompt = document.getElementById('ai-system-prompt').value;
+            const userPrompt = document.getElementById('ai-master-user-prompt').value;
+
+            if (!confirm('🤖 Start Master AI Processing? This will re-summarize every entry.')) return;
+
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = '⏳ Processing...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/summarize_all', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id: 'batch',
+                        content: '',
+                        system_prompt: systemPrompt,
+                        user_prompt: userPrompt
+                    })
+                });
+
+                if (response.ok) {
+                    alert('🚀 AI Batch Processing Started! Entries will update as they complete.');
+                    closeAIModal();
+                } else {
+                    alert('AI Batch failed to start.');
+                }
+            } catch (e) {
+                alert('Connection error.');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // 🤖 INDIVIDUAL AI LOGIC
+        function openEntryAI(id) {
             const entry = document.getElementById(id);
+            const controls = entry.querySelector('.entry-controls');
+
+            // Toggle/Create Popover
+            let popover = entry.querySelector('.ai-entry-popover');
+            if (!popover) {
+                popover = document.createElement('div');
+                popover.className = 'ai-entry-popover';
+                popover.innerHTML = `
+                    <label style="font-size:10px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">Entry-Specific User Prompt</label>
+                    <input type="text" class="ai-inner-input" placeholder="Optional instruction (e.g. 'Extract only data')">
+                    <div class="ai-btn-row">
+                        <button class="control-btn" onclick="closeEntryAI('${id}')">✕</button>
+                        <button class="control-btn" style="background:#3b82f6; color:#fff;" onclick="processEntryAI('${id}')">➜</button>
+                    </div>
+                `;
+                entry.appendChild(popover);
+            }
+
+            const isVisible = popover.style.display === 'flex';
+            document.querySelectorAll('.ai-entry-popover').forEach(p => p.style.display = 'none'); // Close others
+            popover.style.display = isVisible ? 'none' : 'flex';
+            if (!isVisible) popover.querySelector('input').focus();
+        }
+
+        function closeEntryAI(id) {
+            const entry = document.getElementById(id);
+            entry.querySelector('.ai-entry-popover').style.display = 'none';
+        }
+
+        async function processEntryAI(id) {
+            const entry = document.getElementById(id);
+            const input = entry.querySelector('.ai-inner-input');
+            const aiBtn = entry.querySelector('.ai-btn');
+            const userPrompt = input.value;
             const content = entry.querySelector('.content').innerText;
             const tldrSpan = entry.querySelector('.tldr-content');
-            const originalText = tldrSpan.innerText;
 
+            closeEntryAI(id);
             tldrSpan.innerText = "⚡ Re-synthesizing...";
+            aiBtn.classList.add('processing');
 
             try {
                 const sysPrompt = localStorage.getItem('aiSystemPrompt');
@@ -815,21 +984,47 @@
                     body: JSON.stringify({
                         id: id,
                         content: content,
-                        system_prompt: sysPrompt
+                        system_prompt: sysPrompt,
+                        user_prompt: userPrompt
                     })
                 });
 
                 if (response.ok) {
-                    const data = await response.json();
-                    tldrSpan.innerText = data.tldr;
-                    generateIndex(); // Refresh sidebar to show new TL;DR
-                } else {
-                    tldrSpan.innerText = originalText;
-                    alert('AI Generation failed.');
+                    tldrSpan.innerText = "⚡ AI is thinking...";
                 }
             } catch (e) {
-                tldrSpan.innerText = originalText;
-                alert('Connection error.');
+                tldrSpan.innerText = "Generation failed.";
+            } finally {
+                // We'll remove processing class after a few seconds or when the DOM is updated by poller
+                // Since this server-side updates the file, the page might need a refresh or we can poll
+                // For now, let's just pulse for 3 seconds as a "hint"
+                setTimeout(() => aiBtn.classList.remove('processing'), 3000);
+            }
+        }
+
+        async function regenerateTLDR(id) {
+            // Re-use the process Entry AI logic with no user prompt
+            const entry = document.getElementById(id);
+            const aiBtn = entry.querySelector('.ai-btn');
+            const content = entry.querySelector('.content').innerText;
+            const tldrSpan = entry.querySelector('.tldr-content');
+
+            tldrSpan.innerText = "⚡ Re-synthesizing...";
+            if (aiBtn) aiBtn.classList.add('processing');
+
+            try {
+                const sysPrompt = localStorage.getItem('aiSystemPrompt');
+                await fetch('/summarize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id: id,
+                        content: content,
+                        system_prompt: sysPrompt
+                    })
+                });
+            } catch (e) { } finally {
+                if (aiBtn) setTimeout(() => aiBtn.classList.remove('processing'), 3000);
             }
         }
 

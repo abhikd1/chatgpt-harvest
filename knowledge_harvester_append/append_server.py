@@ -57,7 +57,7 @@ class SummarizeData(BaseModel):
 MASTER_FILE = Path("master_harvest.html")
 TEMPLATE_FILE = Path("master_template.html")
 
-def generate_tldr(content: str, system_prompt: str = None):
+def generate_tldr(content: str, system_prompt: str = None, user_prompt: str = ""):
     try:
         if not system_prompt:
             system_prompt = "Summarize this content in exactly one concise, punchy sentence. No fluff."
@@ -65,11 +65,13 @@ def generate_tldr(content: str, system_prompt: str = None):
         # Strip HTML for cleaner processing
         clean_text = re.sub(r'<[^>]*>', '', content)
         
+        prompt_content = f"{user_prompt}\n\nCONTENT:\n{clean_text[:4000]}" if user_prompt else clean_text[:4000]
+        
         response = groq_client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": clean_text[:4000]} # Limit context
+                {"role": "user", "content": prompt_content}
             ]
         )
         return response.choices[0].message.content.strip()
@@ -105,6 +107,7 @@ def append_to_master(new_html: str, source: str):
                 <button onclick="copyEntry('{entry_id}')" class="control-btn copy-btn" title="Copy">📋</button>
                 <button onclick="editEntry('{entry_id}')" class="control-btn edit-btn" title="Edit">✏️</button>
                 <button onclick="saveEntry('{entry_id}')" class="control-btn save-btn" style="display:none;" title="Save">💾</button>
+                <button onclick="openEntryAI('{entry_id}')" class="control-btn ai-btn" title="AI Process">🤖</button>
                 <button onclick="deleteEntry('{entry_id}')" class="control-btn delete-btn" title="Delete">🗑️</button>
             </div>
             <div class="metadata" style="color: #9ca3af; font-size: 0.8em; margin-bottom: 5px;">
@@ -141,22 +144,33 @@ def append_to_master(new_html: str, source: str):
 async def capture(data: CaptureData):
     try:
         entry_id = append_to_master(data.html, data.source)
-        # Background task for TL;DR
+        # Background task for TL;DR with default prompt
         asyncio.create_task(process_tldr_and_update(entry_id, data.html))
         return {"status": "success", "url": "http://localhost:8771/view", "id": entry_id}
     except Exception as e:
         return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
 
-async def process_tldr_and_update(entry_id: str, content: str, system_prompt: str = None):
-    tldr = generate_tldr(content, system_prompt)
+async def process_tldr_and_update(entry_id: str, content: str, system_prompt: str = None, user_prompt: str = ""):
+    tldr = generate_tldr(content, system_prompt, user_prompt)
     try:
         with open(MASTER_FILE, 'r', encoding='utf-8') as f:
             file_content = f.read()
         
-        target = f'id="tldr-{entry_id}">Generating summary...</span>'
-        replacement = f'id="tldr-{entry_id}">{tldr}</span>'
+        # Surgical replacement of the tldr span
+        # Find start of entry, then look for the specific tldr span
+        start_marker = f"<!-- ENTRY_START_{entry_id} -->"
+        if start_marker not in file_content: return
         
-        updated_file = file_content.replace(target, replacement)
+        prefix, remainder = file_content.split(start_marker)
+        entry_block, suffix = remainder.split(f"<!-- ENTRY_END_{entry_id} -->")
+        
+        # Replace the tldr span content
+        # <span class="tldr-content" id="tldr-UUID">OLD</span>
+        pattern = rf'id="tldr-{entry_id}">.*?</span>'
+        replacement = f'id="tldr-{entry_id}">{tldr}</span>'
+        new_entry_block = re.sub(pattern, replacement, entry_block, flags=re.DOTALL)
+        
+        updated_file = prefix + start_marker + new_entry_block + f"<!-- ENTRY_END_{entry_id} -->" + suffix
         with open(MASTER_FILE, 'w', encoding='utf-8') as f:
             f.write(updated_file)
     except Exception as e:
@@ -165,10 +179,31 @@ async def process_tldr_and_update(entry_id: str, content: str, system_prompt: st
 @app.post("/summarize")
 async def summarize(data: SummarizeData):
     try:
-        tldr = generate_tldr(data.content, data.system_prompt)
-        # Also update the master file
-        asyncio.create_task(process_tldr_and_update(data.id, data.content, data.system_prompt))
-        return {"status": "success", "tldr": tldr}
+        # Background task
+        asyncio.create_task(process_tldr_and_update(data.id, data.content, data.system_prompt, data.user_prompt))
+        return {"status": "success", "message": "Processing..."}
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
+
+@app.post("/summarize_all")
+async def summarize_all(data: SummarizeData):
+    try:
+        with open(MASTER_FILE, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        entries = re.findall(r'<!-- ENTRY_START_(.*?) -->', content)
+        
+        async def run_all():
+            for entry_id in entries:
+                # Find entry content
+                pattern = rf'<!-- ENTRY_START_{entry_id} -->[\s\S]*?<div class="content">\s*(.*?)\s*</div>[\s\S]*?<!-- ENTRY_END_{entry_id} -->'
+                match = re.search(pattern, content)
+                if match:
+                    entry_content = match.group(1)
+                    await process_tldr_and_update(entry_id, entry_content, data.system_prompt, data.user_prompt)
+        
+        asyncio.create_task(run_all())
+        return {"status": "success", "count": len(entries)}
     except Exception as e:
         return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
 

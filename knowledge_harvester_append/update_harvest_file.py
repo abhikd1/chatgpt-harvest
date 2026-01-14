@@ -13,14 +13,19 @@ if os.path.exists(MASTER_FILE):
         rest = match.group(3)
         
         if 'tldr-container' in rest:
-            return match.group(0)
-            
-        tldr_block = f"""
-            <div class="tldr-container" style="background: rgba(59, 130, 246, 0.05); border-left: 3px solid #3b82f6; padding: 10px 15px; margin-bottom: 15px; font-size: 13px; font-style: italic; color: var(--text-primary);">
-                <strong>⚡ AI TL;DR:</strong> <span class="tldr-content" id="tldr-{eid}">Migration Note: Click Settings > Regenerate or edit entry to generate AI summary.</span>
-            </div>"""
+            pass # Already has AI support
+        else:
+            tldr_block = f"""
+                <div class="tldr-container" style="background: rgba(59, 130, 246, 0.05); border-left: 3px solid #3b82f6; padding: 10px 15px; margin-bottom: 15px; font-size: 13px; font-style: italic; color: var(--text-primary);">
+                    <strong>⚡ AI TL;DR:</strong> <span class="tldr-content" id="tldr-{eid}">Migration Note: Click 🤖 to generate summary.</span>
+                </div>"""
+            rest = tldr_block + rest
+
+        # Inject AI Button if missing
+        if 'openEntryAI' not in meta_block:
+            meta_block = meta_block.replace('<button onclick="deleteEntry', f'<button onclick="openEntryAI(\'{eid}\')" class="control-btn ai-btn" title="AI Process">🤖</button>\n                <button onclick="deleteEntry')
         
-        return f'<!-- ENTRY_START_{eid} -->{meta_block}{tldr_block}{rest}'
+        return f'<!-- ENTRY_START_{eid} -->{meta_block}{rest}'
 
     # Pattern to find start of entry and inject after metadata
     pattern = r'<!-- ENTRY_START_([a-f0-9\-]+) -->([\s\S]*?<div class="metadata"[\s\S]*?<\/div>)([\s\S]*?<!-- ENTRY_END_)'
