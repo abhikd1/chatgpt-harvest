@@ -46,10 +46,10 @@ def append_to_master(new_html: str, source: str):
     init_master_file()
     
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    # Wrap new content with a separator and metadata (using template class)
+    # Wrap new content with a separator and metadata
     wrapped_content = f"""
-    <div class="harvest-entry" style="margin-top: 80px; padding-top: 40px; border-top: 1px solid var(--border-color);">
-        <div class="metadata" style="margin-bottom: 1.5rem;">
+    <div class="harvest-entry" style="margin-top: 50px; border-top: 2px dashed #374151; padding-top: 20px;">
+        <div class="metadata" style="color: #9ca3af; font-size: 0.8em; margin-bottom: 10px;">
             Captured on: {timestamp} | Source: {source}
         </div>
         <div class="content">
