@@ -113,8 +113,8 @@ async def generate_deep_research_tldr(content: str, system_prompt: str = None, u
     # STEP 2: CONCISE EXPLANATION (Phi-3 Style)
     explain_sys = system_prompt or "You are a sharp, concise editor. Provide a 1-sentence TL;DR based on the reasoning provided."
     explain_user = f"{user_prompt}\n\nDEEP REASONING DATA:\n{reasoning}\n\nNow, provide the final punchy 1-sentence summary for the log."
-    print("DEEP RESEARCH: Step 2: Concise Explanation (Phi-3 Mode)...")
-    tldr = await generate_tldr(content, explain_sys, explain_user, model="llama3-8b-8192")
+    print("DEEP RESEARCH: Step 2: Concise Explanation (Llama 3.1 Mode)...")
+    tldr = await generate_tldr(content, explain_sys, explain_user, model="llama-3.1-8b-instant")
     
     end_time = datetime.now()
     duration = (end_time - start_time).total_seconds()
