@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lossless Capture Viewer</title>
+    <script>
+        // CRITICAL: Load theme BEFORE render to prevent FOUC
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <style>
+        /* 
+           ❄️ FROZEN VIEWPORT SHELL
+           Respects inlined styles from ChatGPT capture.
+        */
+
+        :root {
+            --bg-page: #ffffff;
+            /* Light Default */
+            --text-primary: #0d0d0d;
+            --font-sans: "Söhne", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        html[data-theme="dark"] {
+            --bg-page: #0f0f10;
+            /* ChatGPT Dark */
+            --text-primary: #e5e7eb;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            transition: background-color 0.2s;
+        }
+
+        .container {
+            max-width: 48rem;
+            margin: 0 auto;
+            padding: 4rem 1.5rem;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: sans-serif;
+            font-size: 0.85em;
+            z-index: 100;
+        }
+
+        html[data-theme="dark"] .theme-toggle {
+            background: #1f2937;
+            border-color: #374151;
+            color: white;
+        }
+
+        /* Metadata banner */
+        .metadata {
+            font-size: 0.8em;
+            color: #9ca3af;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #374151;
+            font-family: sans-serif;
+        }
+
+        /* Ensure frozen styles aren't squashed */
+        .container * {
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">☀️ / 🌙</button>
+
+    <div class="container">
+        <!-- Content will be injected here -->
+        
+        <div class="metadata">
+            <strong>Source:</strong> Selection • 
+            <strong>Captured:</strong> 2026-01-14 21:13:58
+        </div>
+        <pre class="overflow-visible! px-0!" data-start="538" data-end="2220" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><div class="overflow-y-auto p-4" dir="ltr" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><code class="whitespace-pre! language-javascript" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><span class="hljs-title function_" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">inlineStyles</span></span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">(target, clone);
+
+    </span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><span class="hljs-comment" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">// 5. Send to local server</span></span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">
+    </span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><span class="hljs-keyword" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">await</span></span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "> </span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><span class="hljs-title function_" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">fetch</span></span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">(</span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><span class="hljs-string" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">"http://localhost:5173/capture"</span></span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">, {
+      </span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><span class="hljs-attr" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">method</span></span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">: </span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><span class="hljs-string" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">"POST"</span></span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">,
+      </span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><span class="hljs-attr" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">headers</span></span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">: { </span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><span class="hljs-string" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">"Content-Type"</span></span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">: </span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><span class="hljs-string" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">"text/html"</span></span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "> },
+      </span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><span class="hljs-attr" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">body</span></span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">: clone.</span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><span class="hljs-property" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">outerHTML</span></span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">
+    });
+
+    </span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><span class="hljs-title function_" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">alert</span></span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">(</span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><span class="hljs-string" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">"✅ Captured EXACT UI"</span></span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">);
+
+  } </span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><span class="hljs-keyword" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">catch</span></span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "> (e) {
+    </span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><span class="hljs-title function_" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">alert</span></span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">(</span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><span class="hljs-string" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">"❌ Capture failed: "</span></span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "> + e.</span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><span class="hljs-property" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">message</span></span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">);
+  }
+})();
+</span></span></code></div></div></pre>
+<p data-start="2222" data-end="2243" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">📌 <strong data-start="2225" data-end="2243" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">Why this works</strong></p>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            if (current === 'dark') {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+    </script>
+</body>
+
+</html>

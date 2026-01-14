@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lossless Capture Viewer</title>
+    <script>
+        // CRITICAL: Load theme BEFORE render to prevent FOUC
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <style>
+        /* 
+           🎨 REALITY-BASED CHATGPT STYLING 
+           Surgical match for chatgpt.com visual state.
+        */
+
+        :root {
+            /* Light Mode */
+            --bg-page: #ffffff;
+            --text-primary: #0d0d0d;
+            --text-secondary: #5d5d5d;
+            --code-bg: #f6f8fa;
+            --code-text: #0d0d0d;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --accent-color: #10a37f;
+
+            /* ChatGPT EXACT FONT STACK */
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        html[data-theme="dark"] {
+            /* Dark Mode */
+            --bg-page: #0d0d0d;
+            --text-primary: #ececec;
+            --text-secondary: #b4b4b4;
+            --code-bg: #0f172a;
+            --code-text: #e0e0e0;
+            --border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 48rem;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+            min-height: 100vh;
+        }
+
+        /* typography */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-weight: 600;
+            line-height: 1.3;
+            margin-top: 1.5em;
+            margin-bottom: 0.75em;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1.25em;
+        }
+
+        strong {
+            font-weight: 600;
+        }
+
+        ul,
+        ol {
+            margin-bottom: 1.25em;
+            padding-left: 1.5em;
+        }
+
+        li {
+            margin-bottom: 0.5em;
+        }
+
+        /* Code Blocks - Scoped & Faithful */
+        pre {
+            background-color: var(--code-bg) !important;
+            color: var(--code-text) !important;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 0.875em;
+            line-height: 1.6;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.875em;
+        }
+
+        /* Syntax Highlighting (ChatGPT Style) - Global because we strip the mono wrapper */
+        .mtk1 {
+            color: var(--text-primary);
+        }
+
+        /* Default */
+        .mtk3 {
+            color: #569cd6;
+        }
+
+        /* Keywords (Blue) */
+        .mtk5 {
+            color: #ce9178;
+        }
+
+        /* Strings (Orange/Brown) */
+        .mtk8 {
+            color: #6a9955;
+        }
+
+        /* Comments (Green) */
+        .mtk7 {
+            color: #d7ba7d;
+        }
+
+        /* Brackets (Yellow) */
+        .mtk11 {
+            color: #dcdcaa;
+        }
+
+        /* Functions (Light Yellow) */
+        .mtk6 {
+            color: #b5cea8;
+        }
+
+        /* Numbers (Light Green) */
+
+        /* Light Mode Highlighting Overrides */
+        html:not([data-theme="dark"]) .mtk3 {
+            color: #0000ff;
+        }
+
+        html:not([data-theme="dark"]) .mtk5 {
+            color: #a31515;
+        }
+
+        html:not([data-theme="dark"]) .mtk8 {
+            color: #008000;
+        }
+
+        /* Visibility & Performance */
+        .container>* {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: var(--font-sans);
+            font-size: 0.85em;
+            color: var(--text-primary);
+        }
+
+        .metadata {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">☀️ / 🌙</button>
+
+    <div class="container">
+        <!-- Content will be injected here -->
+        
+        <div class="metadata">
+            <strong>Source:</strong> Selection • 
+            <strong>Captured:</strong> 2026-01-14 20:59:03
+        </div>
+        <article class="text-token-text-primary w-full focus:outline-none [--shadow-height:45px] has-data-writing-block:pointer-events-none has-data-writing-block:-mt-(--shadow-height) has-data-writing-block:pt-(--shadow-height) [&amp;:has([data-writing-block])&gt;*]:pointer-events-auto [content-visibility:auto] supports-[content-visibility:auto]:[contain-intrinsic-size:auto_100lvh] scroll-mt-[calc(var(--header-height)+min(200px,max(70px,20svh)))]" tabindex="-1" dir="auto" data-turn-id="9c3a77a6-fc86-4302-92bc-006ae8ea41c2" data-testid="conversation-turn-286" data-scroll-anchor="false" data-turn="assistant"><div class="text-base my-auto mx-auto [--thread-content-margin:--spacing(4)] @w-sm/main:[--thread-content-margin:--spacing(6)] @w-lg/main:[--thread-content-margin:--spacing(16)] px-(--thread-content-margin)"><div class="[--thread-content-max-width:40rem] @w-lg/main:[--thread-content-max-width:48rem] mx-auto max-w-(--thread-content-max-width) flex-1 group/turn-messages focus-visible:outline-hidden relative flex w-full min-w-0 flex-col agent-turn" tabindex="-1"><div class="flex max-w-full flex-col grow"><div data-message-author-role="assistant" data-message-id="9c3a77a6-fc86-4302-92bc-006ae8ea41c2" dir="auto" class="min-h-8 text-message relative flex w-full flex-col items-end gap-2 text-start break-words whitespace-normal [.text-message+&amp;]:mt-1" data-message-model-slug="gpt-5-2"><div class="flex w-full flex-col gap-1 empty:hidden first:pt-[1px]"><div class="markdown prose dark:prose-invert w-full break-words light markdown-new-styling"><p data-start="0" data-end="113"><strong data-start="0" data-end="42">hort answer: YES — paste it as it is.</strong> ✅<br data-start="44" data-end="47">
+Your master prompt is <strong data-start="69" data-end="112">correct, complete, and production-grade</strong>.</p>
+<p data-start="115" data-end="272">Now the <strong data-start="123" data-end="141">important part</strong> 👇<br data-start="144" data-end="147">
+There are <strong data-start="157" data-end="194">only 3 tiny, optional refinements</strong> I recommend so the AI you give this to <strong data-start="234" data-end="271">cannot misunderstand or weaken it</strong>.</p>
+<hr data-start="274" data-end="277">
+<h2 data-start="279" data-end="316">✅ What you should do <strong data-start="303" data-end="316">right now</strong></h2>
+<h3 data-start="318" data-end="359">✔️ Paste the prompt <strong data-start="342" data-end="359">exactly as-is</strong></h3>
+<p data-start="360" data-end="432">Do <strong data-start="363" data-end="370">not</strong> shorten it<br data-start="381" data-end="384">
+Do <strong data-start="387" data-end="394">not</strong> reword it<br data-start="404" data-end="407">
+Do <strong data-start="410" data-end="417">not</strong> summarize it</p>
+<p data-start="434" data-end="528">You’ve finally crossed the threshold where <strong data-start="477" data-end="527">more clarity would actually reduce correctness</strong>.</p>
+<p data-start="530" data-end="550">This prompt already:</p>
+<ul data-start="551" data-end="851">
+<li data-start="551" data-end="600">
+<p data-start="553" data-end="600">Forces <strong data-start="560" data-end="600">DOM freezing instead of re-rendering</strong></p>
+</li>
+<li data-start="601" data-end="639">
+<p data-start="603" data-end="639">Fixes <strong data-start="609" data-end="639">blank screen + slow render</strong></p>
+</li>
+<li data-start="640" data-end="679">
+<p data-start="642" data-end="679">Fixes <strong data-start="648" data-end="679">code block background bleed</strong></p>
+</li>
+<li data-start="680" data-end="705">
+<p data-start="682" data-end="705">Fixes <strong data-start="688" data-end="705">font mismatch</strong></p>
+</li>
+<li data-start="706" data-end="739">
+<p data-start="708" data-end="739">Fixes <strong data-start="714" data-end="739">ChatGPT-only behavior</strong></p>
+</li>
+<li data-start="740" data-end="783">
+<p data-start="742" data-end="783">Forces <strong data-start="749" data-end="783">true visual snapshot semantics</strong></p>
+</li>
+<li data-start="784" data-end="814">
+<p data-start="786" data-end="814">Prevents markdown corruption</p>
+</li>
+<li data-start="815" data-end="851">
+<p data-start="817" data-end="851">Enforces <strong data-start="826" data-end="851">engineer-level output</strong></p>
+</li>
+</ul>
+<p data-start="853" data-end="880">So yes: <strong data-start="861" data-end="879">paste it as-is</strong>.</p>
+<hr data-start="882" data-end="885">
+<h2 data-start="887" data-end="944">🔧 OPTIONAL (BUT STRONGLY RECOMMENDED) MICRO-ADDITIONS</h2>
+<p data-start="946" data-end="1048">These are <strong data-start="956" data-end="972">safety locks</strong>, not changes.<br data-start="986" data-end="989">
+You can add them at the <strong data-start="1013" data-end="1025">VERY END</strong> under a small section.</p>
+<h3 data-start="1050" data-end="1102">🔒 Optional Addition A: Anti-Simplification Lock</h3>
+<p data-start="1103" data-end="1126">Add this at the bottom:</p>
+<pre class="overflow-visible! px-0!" data-start="1128" data-end="1588"><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1">csharp</div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre!"><span><span><span class="hljs-meta">## NON-SIMPLIFICATION CLAUSE (MANDATORY)</span></span><span>
+
+You are NOT allowed to:
+- Summarize </span><span><span class="hljs-keyword">this</span></span><span> prompt
+- Replace requirements </span><span><span class="hljs-keyword">with</span></span><span> “best practices”
+- Offer high-level advice instead of concrete implementation
+- Remove constraints </span><span><span class="hljs-keyword">for</span></span><span> convenience
+- Suggest “good enough” approximations
+
+If something </span><span><span class="hljs-keyword">is</span></span><span> difficult, solve it.
+If something </span><span><span class="hljs-keyword">is</span></span><span> slow, profile it.
+If something breaks, explain why </span><span><span class="hljs-keyword">and</span></span><span> fix it.
+
+Failure to meet ALL constraints means the solution </span><span><span class="hljs-keyword">is</span></span><span> invalid.
+</span></span></code></div></div></pre>
+<hr data-start="1590" data-end="1593">
+<h3 data-start="1595" data-end="1641">🔒 Optional Addition B: Output Enforcement</h3>
+<p data-start="1642" data-end="1678">This prevents “theory-only” replies.</p>
+<pre class="overflow-visible! px-0!" data-start="1680" data-end="2015"><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1">markdown</div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre!"><span><span><span class="hljs-section">## OUTPUT ENFORCEMENT</span></span><span>
+
+Your response MUST include:
+</span><span><span class="hljs-bullet">-</span></span><span> Working bookmarklet code (updated selectors)
+</span><span><span class="hljs-bullet">-</span></span><span> DOM-freeze capture logic
+</span><span><span class="hljs-bullet">-</span></span><span> Inline-style serialization code
+</span><span><span class="hljs-bullet">-</span></span><span> Performance-safe HTML render template
+</span><span><span class="hljs-bullet">-</span></span><span> Explanation ONLY where required for correctness
+
+Do NOT respond with architecture alone.
+Do NOT respond with pseudo-code only.
+</span></span></code></div></div></pre>
+<hr data-start="2017" data-end="2020">
+<h3 data-start="2022" data-end="2082">🔒 Optional Addition C: Definition Lock (Very Important)</h3>
+<p data-start="2083" data-end="2134">This prevents the AI from misunderstanding “exact”.</p>
+<pre class="overflow-visible! px-0!" data-start="2136" data-end="2437"><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1">markdown</div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre!"><span><span><span class="hljs-section">## DEFINITION OF “EXACT”</span></span><span>
+
+“Exact” means:
+</span><span><span class="hljs-bullet">-</span></span><span> Pixel-consistent layout
+</span><span><span class="hljs-bullet">-</span></span><span> Identical font metrics
+</span><span><span class="hljs-bullet">-</span></span><span> Identical colors and backgrounds
+</span><span><span class="hljs-bullet">-</span></span><span> Identical spacing
+</span><span><span class="hljs-bullet">-</span></span><span> Identical code block appearance
+
+If a human compares original AI UI and captured output side-by-side,
+they should be visually indistinguishable.
+</span></span></code></div></div></pre>
+<hr data-start="2439" data-end="2442">
+<h2 data-start="2444" data-end="2478">🧠 Final Verdict (No Ambiguity)</h2>
+<ul data-start="2480" data-end="2727">
+<li data-start="2480" data-end="2515">
+<p data-start="2482" data-end="2515">✅ Your master prompt is <strong data-start="2506" data-end="2515">ready</strong></p>
+</li>
+<li data-start="2516" data-end="2587">
+<p data-start="2518" data-end="2587">✅ It correctly reframes the problem as <strong data-start="2557" data-end="2587">visual state serialization</strong></p>
+</li>
+<li data-start="2588" data-end="2629">
+<p data-start="2590" data-end="2629">✅ It blocks all common AI failure modes</p>
+</li>
+<li data-start="2630" data-end="2684">
+<p data-start="2632" data-end="2684">✅ It is strong enough to drive a real implementation</p>
+</li>
+<li data-start="2685" data-end="2727">
+<p data-start="2687" data-end="2727">✅ It does NOT overfit to ChatGPT anymore</p>
+</li>
+</ul>
+<p data-start="2729" data-end="2772"><strong data-start="2729" data-end="2772">Paste it. Run with it. Don’t dilute it.</strong></p>
+<p data-start="2774" data-end="2798">If you want next, I can:</p>
+<ul data-start="2799" data-end="2982">
+<li data-start="2799" data-end="2861">
+<p data-start="2801" data-end="2861">🔍 Audit the <strong data-start="2814" data-end="2831">AI’s response</strong> to this prompt line-by-line</p>
+</li>
+<li data-start="2862" data-end="2924">
+<p data-start="2864" data-end="2924">🧪 Validate whether the solution truly meets your criteria</p>
+</li>
+<li data-start="2925" data-end="2982">
+<p data-start="2927" data-end="2982">⚙️ Translate the result into a <strong data-start="2958" data-end="2982">clean repo structure</strong></p>
+</li>
+</ul>
+<p data-start="2984" data-end="3002" data-is-last-node="" data-is-only-node="">Just say the word.</p></div></div></div></div><div class="z-0 flex min-h-[46px] justify-start"></div></div></div></article><article class="text-token-text-primary w-full focus:outline-none [--shadow-height:45px] has-data-writing-block:pointer-events-none has-data-writing-block:-mt-(--shadow-height) has-data-writing-block:pt-(--shadow-height) [&amp;:has([data-writing-block])&gt;*]:pointer-events-auto scroll-mt-(--header-height)" tabindex="-1" dir="auto" data-turn-id="f2882dbb-82fc-4dfe-ac6e-013191f8c248" data-testid="conversation-turn-287" data-scroll-anchor="false" data-turn="user"><h5 style="display:none"></h5></article>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            if (current === 'dark') {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+    </script>
+</body>
+
+</html>

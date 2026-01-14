@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lossless Capture Viewer</title>
+    <script>
+        // CRITICAL: Load theme BEFORE render to prevent FOUC
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <style>
+        /* 
+           🎯 CHATGPT OFFICIAL UI SCHEMA 
+           1:1 Fidelity Implementation
+        */
+
+        :root {
+            /* Light Mode */
+            --bg-page: #ffffff;
+            --text-primary: #0d0d0d;
+            --text-secondary: #6b7280;
+            --code-bg: #f9fafb;
+            --code-text: #111827;
+            --border-color: #e5e7eb;
+            --accent-color: #10a37f;
+
+            /* EXACT FONT STACK */
+            --font-sans: "Söhne", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        html[data-theme="dark"] {
+            /* EXACT DARK MODE COLORS */
+            --bg-page: #0f0f10;
+            --text-primary: #e5e7eb;
+            --text-secondary: #9ca3af;
+            --code-bg: #111827;
+            --code-text: #e5e7eb;
+            --border-color: #374151;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 16px;
+            /* User Schema Requirement */
+            line-height: 1.75;
+            /* User Schema Requirement for spacing */
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 48rem;
+            margin: 0 auto;
+            padding: 4rem 1.5rem;
+            min-height: 100vh;
+        }
+
+        /* 🧱 HEADINGS - 600 weight, matched size */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.75;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1.25rem;
+        }
+
+        strong {
+            font-weight: 600;
+        }
+
+        ul,
+        ol {
+            margin-bottom: 1.25rem;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* 💻 CODE BLOCKS - Exact Spacing & Colors */
+        pre {
+            background-color: var(--code-bg) !important;
+            color: var(--code-text) !important;
+            padding: 12px 14px;
+            /* User Schema Requirement */
+            border-radius: 8px;
+            /* User Schema Requirement */
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 14px;
+            /* User Schema Requirement */
+            line-height: 1.6;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 14px;
+        }
+
+        /* Inline Code */
+        :not(pre)>code {
+            background-color: #1f2937;
+            /* Darker for dark mode */
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+
+        html:not([data-theme="dark"]) :not(pre)>code {
+            background-color: #f3f4f6;
+        }
+
+        /* 🖌 SYNTAX COLORS (MUTED GPT STYLE) */
+        .mtk3 {
+            color: #93c5fd;
+        }
+
+        /* Keywords */
+        .mtk5 {
+            color: #86efac;
+        }
+
+        /* Strings */
+        .mtk8 {
+            color: #6b7280;
+        }
+
+        /* Comments */
+        .mtk6 {
+            color: #fca5a5;
+        }
+
+        /* Numbers */
+        .mtk11 {
+            color: #c4b5fd;
+        }
+
+        /* Functions */
+
+        /* Light Mode Highlighting Overrides */
+        html:not([data-theme="dark"]) .mtk3 {
+            color: #2563eb;
+        }
+
+        html:not([data-theme="dark"]) .mtk5 {
+            color: #16a34a;
+        }
+
+        html:not([data-theme="dark"]) .mtk8 {
+            color: #6b7280;
+        }
+
+        /* 🧩 TABLES - Minimal & Flat */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 16px 0;
+        }
+
+        th,
+        td {
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        /* UI Controls */
+        .container>* {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: var(--font-sans);
+            font-size: 0.85em;
+            color: var(--text-primary);
+            z-index: 100;
+        }
+
+        .metadata {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">☀️ / 🌙</button>
+
+    <div class="container">
+        <!-- Content will be injected here -->
+        
+        <div class="metadata">
+            <strong>Source:</strong> Selection • 
+            <strong>Captured:</strong> 2026-01-14 21:06:27
+        </div>
+        <h2 data-start="3017" data-end="3060">5️⃣ SYNTAX COLORS (SUBTLE, NOT COLORFUL)</h2>
+<p data-start="3062" data-end="3108">ChatGPT syntax highlighting is <strong data-start="3093" data-end="3107">very muted</strong>.</p>
+<p data-start="3110" data-end="3139">Example theme (conceptually):</p>
+<div class="TyagGW_tableContainer"><div tabindex="-1" class="group TyagGW_tableWrapper flex flex-col-reverse w-fit"><table data-start="3141" data-end="3294" class="w-fit min-w-(--thread-content-width)"><thead data-start="3141" data-end="3158"><tr data-start="3141" data-end="3158"><th data-start="3141" data-end="3149" data-col-size="sm">Token</th><th data-start="3149" data-end="3158" data-col-size="sm">Color</th></tr></thead><tbody data-start="3171" data-end="3294"><tr data-start="3171" data-end="3195"><td data-start="3171" data-end="3182" data-col-size="sm">Keywords</td><td data-start="3182" data-end="3195" data-col-size="sm"><code data-start="3184" data-end="3193">#93c5fd</code></td></tr><tr data-start="3196" data-end="3219"><td data-start="3196" data-end="3206" data-col-size="sm">Strings</td><td data-col-size="sm" data-start="3206" data-end="3219"><code data-start="3208" data-end="3217">#86efac</code></td></tr><tr data-start="3220" data-end="3244"><td data-start="3220" data-end="3231" data-col-size="sm">Comments</td><td data-start="3231" data-end="3244" data-col-size="sm"><code data-start="3233" data-end="3242">#6b7280</code></td></tr><tr data-start="3245" data-end="3268"><td data-start="3245" data-end="3255" data-col-size="sm">Numbers</td><td data-start="3255" data-end="3268" data-col-size="sm"><code data-start="3257" data-end="3266">#fca5a5</code></td></tr><tr data-start="3269" data-end="3294"><td data-start="3269" data-end="3281" data-col-size="sm">Functions</td><td data-start="3281" data-end="3294" data-col-size="sm"><code data-start="3283" data-end="3292">#c4b5fd</code></td></tr></tbody></table><div class="sticky h-0 select-none end-(--thread-content-margin) self-end"><div class="absolute end-0 flex items-end" style="height: 33px;"><span class="" data-state="closed"></span></div></div></div></div>
+<p data-start="3296" data-end="3346">👉 If your code looks <strong data-start="3318" data-end="3333">rainbow-ish</strong>, it’s wrong.</p>
+<p data-start="3348" data-end="3395">ChatGPT prioritizes <strong data-start="3368" data-end="3383">readability</strong>, not color.</p>
+<hr data-start="3397" data-end="3400">
+<h2 data-start="3402" data-end="3447">6️⃣ COPY CODE BUTTON — HOW IT REALLY WORKS</h2>
+<h3 data-start="3449" data-end="3465">UI behavior:</h3>
+<ul data-start="3466" data-end="3549">
+<li data-start="3466" data-end="3493">
+<p data-start="3468" data-end="3493">Appears <strong data-start="3476" data-end="3493">only on hover</strong></p>
+</li>
+<li data-start="3494" data-end="3526">
+<p data-start="3496" data-end="3526">Top-right corner of code block</p>
+</li>
+<li data-start="3527" data-end="3549">
+<p data-start="3529" data-end="3549">Not part of code DOM</p>
+</li>
+</ul>
+<h3 data-start="3551" data-end="3573">Technical reality:</h3>
+<ul data-start="3574" data-end="3686">
+<li data-start="3574" data-end="3611">
+<p data-start="3576" data-end="3611">Button is <strong data-start="3586" data-end="3611">absolutely positioned</strong></p>
+</li>
+<li data-start="3612" data-end="3644">
+<p data-start="3614" data-end="3644">Code block itself is untouched</p>
+</li>
+<li data-start="3645" data-end="3686">
+<p data-start="3647" data-end="3686">Copy reads from <strong data-start="3663" data-end="3676">innerText</strong>, not HTML</p>
+</li>
+</ul>
+<p data-start="3688" data-end="3708">Typical positioning:</p>
+<pre class="overflow-visible! px-0!" data-start="3709" data-end="3761"><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1">css</div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre! language-css"><span><span><span class="hljs-attribute">position</span></span><span>: absolute;
+</span><span><span class="hljs-attribute">top</span></span><span>: </span><span><span class="hljs-number">6px</span></span><span>;
+</span><span><span class="hljs-attribute">right</span></span><span>: </span><span><span class="hljs-number">8px</span></span><span>;
+</span></span></code></div></div></pre>
+<p data-start="3763" data-end="3842">👉 If you embed the button into the code block HTML, it will never feel native.</p>
+
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            if (current === 'dark') {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lossless Capture Viewer</title>
+    <script>
+        // CRITICAL: Load theme BEFORE render to prevent FOUC
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <style>
+        /* 
+           🎨 THE SOUL OF READABILITY 
+           Inspired by the best AI interfaces (ChatGPT, Claude, Gemini)
+           Focus: Clarity, Typography, Whitespace.
+        */
+
+        :root {
+            /* Light Mode Variables */
+            --bg-page: #ffffff;
+            --bg-content: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #5d5d5d;
+            --code-bg: #f6f8fa;
+            /* GitHub-style light code var */
+            --code-text: #24292e;
+            --border-color: #e1e4e8;
+            --accent-color: #10a37f;
+            /* ChatGPT Greenish */
+            --font-sans: "Söhne", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: "Söhne Mono", "Monaco", "Andale Mono", monospace;
+            --max-width: 48rem;
+            /* 768px - Optimal reading width */
+        }
+
+        html[data-theme="dark"] {
+            /* Dark Mode Variables */
+            --bg-page: #1e1e1e;
+            /* VS Code dark is nice, let's go darker like ChatGPT */
+            --bg-page: #101010;
+            /* Near black */
+            --bg-content: #101010;
+            --text-primary: #ececec;
+            --text-secondary: #a0a0a0;
+            --code-bg: #000000;
+            /* Deep black for code */
+            --code-text: #e0e0e0;
+            --border-color: #333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            line-height: 1.75;
+            /* Generous line height for reading */
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* The Reading Container */
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+            background-color: var(--bg-content);
+            min-height: 100vh;
+        }
+
+        /* Typography */
+        h1,
+        h2,
+        h3,
+        h4 {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-top: 1.5em;
+            margin-bottom: 0.75em;
+            line-height: 1.3;
+        }
+
+        h1 {
+            font-size: 2em;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5em;
+        }
+
+        h2 {
+            font-size: 1.5em;
+        }
+
+        h3 {
+            font-size: 1.25em;
+        }
+
+        p {
+            margin-bottom: 1.25em;
+        }
+
+        strong {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        em {
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        /* Lists */
+        ul,
+        ol {
+            margin-bottom: 1.25em;
+            padding-left: 1.5em;
+        }
+
+        li {
+            margin-bottom: 0.5em;
+        }
+
+        /* Links */
+        a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* CODE BLOCKS - The Star of the Show */
+        pre {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.25rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border-color);
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+            line-height: 1.6;
+            white-space: pre;
+            /* Important for preserving code structure */
+        }
+
+        /* Inline Code */
+        code:not(pre code) {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.95em;
+        }
+
+        th,
+        td {
+            border: 1px solid var(--border-color);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        /* Toggle Button */
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: var(--font-sans);
+            font-size: 0.85em;
+            color: var(--text-primary);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-toggle:hover {
+            opacity: 0.8;
+        }
+
+        /* Utility */
+        hr {
+            border: 0;
+            border-top: 1px solid var(--border-color);
+            margin: 2rem 0;
+        }
+
+        .metadata {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* 🔒 CRITICAL: Isolate captured content styles (SAFE MODE) */
+        .container>*:not(.metadata) {
+            /* Target ALL direct children, not just divs */
+            font-family: var(--font-sans);
+            color: var(--text-primary);
+            font-size: 16px;
+            line-height: 1.75;
+            overflow-wrap: break-word;
+            /* Force transparency to prevent 'white blocks' from missing vars */
+            background-color: transparent !important;
+
+            /* FORCE VISIBILITY */
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        /* Prevent white-on-white text issues if variables are missing */
+        .container>*:not(.metadata) * {
+            color: inherit;
+            /* Fallback to parent color if var(--text-primary) fails */
+            background-color: transparent;
+            /* Default to transparent layout */
+        }
+
+        /* Re-apply template styles to captured content */
+        .container>div:not(.metadata) * {
+            font-family: inherit;
+        }
+
+        /* 🔥 MONACO EDITOR (ChatGPT Code Block) COLORS */
+        /* These classes (mtk*) are what ChatGPT uses for syntax highlighting */
+
+        .monaco-editor .mtk1 {
+            color: #d4d4d4;
+        }
+
+        /* Default Text */
+        .monaco-editor .mtk2 {
+            color: #1e1e1e;
+        }
+
+        /* Background (usually handled by container) */
+        .monaco-editor .mtk3 {
+            color: #569cd6;
+        }
+
+        /* Keywords (blue) */
+        .monaco-editor .mtk4 {
+            color: #9cdcfe;
+        }
+
+        /* Variables (light blue) */
+        .monaco-editor .mtk5 {
+            color: #ce9178;
+        }
+
+        /* Strings (orange/brown) */
+        .monaco-editor .mtk6 {
+            color: #b5cea8;
+        }
+
+        /* Numbers (light green) */
+        .monaco-editor .mtk7 {
+            color: #d7ba7d;
+        }
+
+        /* Brackets/types (yellow) */
+        .monaco-editor .mtk8 {
+            color: #6a9955;
+        }
+
+        /* Comments (green) */
+        .monaco-editor .mtk9 {
+            color: #c586c0;
+        }
+
+        /* Control flow (purple) */
+        .monaco-editor .mtk10 {
+            color: #4ec9b0;
+        }
+
+        /* Classes/Types */
+        .monaco-editor .mtk11 {
+            color: #dcdcaa;
+        }
+
+        /* Functions */
+        .monaco-editor .mtk12 {
+            color: #808080;
+        }
+
+        /* Subtle text */
+
+        /* Light Theme Overrides for Monaco */
+        html:not([data-theme="dark"]) .monaco-editor .mtk1 {
+            color: #000000;
+        }
+
+        html:not([data-theme="dark"]) .monaco-editor .mtk3 {
+            color: #0000ff;
+        }
+
+        html:not([data-theme="dark"]) .monaco-editor .mtk4 {
+            color: #001080;
+        }
+
+        html:not([data-theme="dark"]) .monaco-editor .mtk5 {
+            color: #a31515;
+        }
+
+        html:not([data-theme="dark"]) .monaco-editor .mtk8 {
+            color: #008000;
+        }
+
+        html:not([data-theme="dark"]) .monaco-editor .mtk9 {
+            color: #af00db;
+        }
+
+        /* Ensure Monaco Editor Background Matches */
+        .monaco-editor,
+        .monaco-editor-background {
+            background-color: var(--code-bg) !important;
+            font-family: var(--font-mono) !important;
+        }
+
+        /* Handle the outer container of code blocks in ChatGPT */
+        pre {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            overflow: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">☀️ / 🌙</button>
+
+    <div class="container">
+        <!-- Content will be injected here -->
+        
+        <div class="metadata">
+            <strong>Source:</strong> Selection • 
+            <strong>Captured:</strong> 2026-01-14 18:10:16
+        </div>
+        <p data-start="0" data-end="171">t it 👍<br data-start="9" data-end="12">
+I’ll <strong data-start="17" data-end="42">strip everything down</strong> and give you the <strong data-start="60" data-end="95">easiest, shortest, reliable way</strong>, plus <strong data-start="102" data-end="149">why you’re seeing “no content” and slowness</strong>, and <strong data-start="155" data-end="170">exact fixes</strong>.</p>
+<hr data-start="173" data-end="176">
+<h1 data-start="178" data-end="213">✅ THE SIMPLEST WAY (NO CONFUSION)</h1>
+<h2 data-start="215" data-end="225">🔹 Goal</h2>
+<p data-start="226" data-end="287">Capture ChatGPT response <strong data-start="251" data-end="271">with visual look</strong> without errors.</p>
+<hr data-start="289" data-end="292">
+<h2 data-start="294" data-end="330">STEP 1 — Start Server (ONLY ONCE)</h2>
+<p data-start="332" data-end="390">Open <strong data-start="337" data-end="358">CMD or PowerShell</strong> in your project folder and run:</p>
+<pre class="overflow-visible! px-0!" data-start="392" data-end="434"><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1">powershell</div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"><button class="flex gap-1 items-center select-none py-1" aria-label="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon-sm"><use href="/cdn/assets/sprites-core-jtokmzgv.svg#ce3544" fill="currentColor"></use></svg>Copy code</button></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre! language-powershell"><span><span>python capture_server.py
+</span></span></code></div></div></pre>
+<p data-start="436" data-end="475">You MUST see this and <strong data-start="458" data-end="474">keep it open</strong>:</p>
+<pre class="overflow-visible! px-0!" data-start="477" data-end="556"><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1">arduino</div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"><button class="flex gap-1 items-center select-none py-1" aria-label="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon-sm"><use href="/cdn/assets/sprites-core-jtokmzgv.svg#ce3544" fill="currentColor"></use></svg>Copy code</button></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre!"><span><span><span class="hljs-built_in">Server</span></span><span> running on http:</span><span><span class="hljs-comment">//localhost:8765</span></span><span>
+Waiting </span><span><span class="hljs-keyword">for</span></span><span> browser captures...
+</span></span></code></div></div></pre>
+<p data-start="558" data-end="642">❌ If you close this → bookmarklet/extension will FAIL<br data-start="611" data-end="614">
+✅ Keep this terminal running</p>
+<hr data-start="644" data-end="647">
+<h2 data-start="649" data-end="697">STEP 2 — USE THIS UPDATED BOOKMARKLET (FIXED)</h2>
+<h3 data-start="699" data-end="745">Why your current one says <strong data-start="729" data-end="745">“No content”</strong></h3>
+<p data-start="746" data-end="819">ChatGPT <strong data-start="754" data-end="773">changed its DOM</strong>.<br data-start="774" data-end="777">
+<code data-start="777" data-end="794">.markdown.prose</code> ❌ is no longer reliable.</p>
+<h3 data-start="821" data-end="861">✅ Working selector (current ChatGPT)</h3>
+<p data-start="863" data-end="907">Create a bookmark and paste <strong data-start="891" data-end="904">THIS ONLY</strong> 👇</p>
+<pre class="overflow-visible! px-0!" data-start="909" data-end="1525"><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1">javascript</div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"><button class="flex gap-1 items-center select-none py-1" aria-label="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon-sm"><use href="/cdn/assets/sprites-core-jtokmzgv.svg#ce3544" fill="currentColor"></use></svg>Copy code</button></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre! language-javascript"><span><span><span class="hljs-attr">javascript</span></span><span>:(</span><span><span class="hljs-keyword">function</span></span><span>(</span><span><span class="hljs-params"></span></span><span>){
+  </span><span><span class="hljs-keyword">let</span></span><span> el =
+    </span><span><span class="hljs-variable language_">document</span></span><span>.</span><span><span class="hljs-title function_">querySelector</span></span><span>(</span><span><span class="hljs-string">'article [data-message-author-role="assistant"]'</span></span><span>) ||
+    </span><span><span class="hljs-variable language_">document</span></span><span>.</span><span><span class="hljs-title function_">querySelector</span></span><span>(</span><span><span class="hljs-string">'[data-testid="conversation-turn"]:last-child'</span></span><span>) ||
+    </span><span><span class="hljs-variable language_">document</span></span><span>.</span><span><span class="hljs-title function_">querySelector</span></span><span>(</span><span><span class="hljs-string">'article'</span></span><span>);
+
+  </span><span><span class="hljs-keyword">if</span></span><span>(!el){
+    </span><span><span class="hljs-title function_">alert</span></span><span>(</span><span><span class="hljs-string">"❌ No ChatGPT content found"</span></span><span>);
+    </span><span><span class="hljs-keyword">return</span></span><span>;
+  }
+
+  </span><span><span class="hljs-title function_">fetch</span></span><span>(</span><span><span class="hljs-string">"http://localhost:8765"</span></span><span>,{
+    </span><span><span class="hljs-attr">method</span></span><span>:</span><span><span class="hljs-string">"POST"</span></span><span>,
+    </span><span><span class="hljs-attr">headers</span></span><span>:{ </span><span><span class="hljs-string">"Content-Type"</span></span><span>:</span><span><span class="hljs-string">"application/json"</span></span><span> },
+    </span><span><span class="hljs-attr">body</span></span><span>: </span><span><span class="hljs-title class_">JSON</span></span><span>.</span><span><span class="hljs-title function_">stringify</span></span><span>({
+      </span><span><span class="hljs-attr">html</span></span><span>: el.</span><span><span class="hljs-property">innerHTML</span></span><span>,
+      </span><span><span class="hljs-attr">source</span></span><span>: </span><span><span class="hljs-string">"ChatGPT"</span></span><span>
+    })
+  })
+  .</span><span><span class="hljs-title function_">then</span></span><span>(</span><span><span class="hljs-function"><span class="hljs-params">r</span></span></span><span>=&gt;r.</span><span><span class="hljs-title function_">json</span></span><span>())
+  .</span><span><span class="hljs-title function_">then</span></span><span>(</span><span><span class="hljs-function"><span class="hljs-params">d</span></span></span><span>=&gt;</span><span><span class="hljs-title function_">alert</span></span><span>(</span><span><span class="hljs-string">"✅ Captured"</span></span><span>))
+  .</span><span><span class="hljs-title function_">catch</span></span><span>(</span><span><span class="hljs-function">()=&gt;</span></span><span><span class="hljs-title function_">alert</span></span><span>(</span><span><span class="hljs-string">"❌ Server not running"</span></span><span>));
+})();
+</span></span></code></div></div></pre>
+<p data-start="1527" data-end="1554">Name it: <strong data-start="1536" data-end="1554">Capture Render</strong></p>
+<hr data-start="1556" data-end="1559">
+<h2 data-start="1561" data-end="1594">STEP 3 — TEST (30-SECOND TEST)</h2>
+<ol data-start="1596" data-end="1746">
+<li data-start="1596" data-end="1616">
+<p data-start="1599" data-end="1616">Go to <strong data-start="1605" data-end="1616">ChatGPT</strong></p>
+</li>
+<li data-start="1617" data-end="1646">
+<p data-start="1620" data-end="1646">Ask <strong data-start="1624" data-end="1646">any short question</strong></p>
+</li>
+<li data-start="1647" data-end="1682">
+<p data-start="1650" data-end="1682">Wait until response <strong data-start="1670" data-end="1682">FINISHES</strong></p>
+</li>
+<li data-start="1683" data-end="1710">
+<p data-start="1686" data-end="1710">Click <strong data-start="1692" data-end="1710">Capture Render</strong></p>
+</li>
+<li data-start="1711" data-end="1746">
+<p data-start="1714" data-end="1746">Check terminal → you should see:</p>
+</li>
+</ol>
+<pre class="overflow-visible! px-0!" data-start="1748" data-end="1818"><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1">css</div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"><button class="flex gap-1 items-center select-none py-1" aria-label="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon-sm"><use href="/cdn/assets/sprites-core-jtokmzgv.svg#ce3544" fill="currentColor"></use></svg>Copy code</button></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre!"><span><span>Captured render </span><span><span class="hljs-selector-tag">from</span></span><span> ChatGPT
+Saved </span><span><span class="hljs-selector-tag">to</span></span><span> renders/RENDER_XXXX</span><span><span class="hljs-selector-class">.html</span></span><span>
+</span></span></code></div></div></pre>
+<ol start="6" data-start="1820" data-end="1833">
+<li data-start="1820" data-end="1833">
+<p data-start="1823" data-end="1833">Open file:</p>
+</li>
+</ol>
+<pre class="overflow-visible! px-0!" data-start="1834" data-end="1865"><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1">powershell</div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"><button class="flex gap-1 items-center select-none py-1" aria-label="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon-sm"><use href="/cdn/assets/sprites-core-jtokmzgv.svg#ce3544" fill="currentColor"></use></svg>Copy code</button></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre! language-powershell"><span><span><span class="hljs-built_in">start</span></span><span> renders</span></span></code></div></div></pre>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            if (current === 'dark') {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+    </script>
+</body>
+
+</html>

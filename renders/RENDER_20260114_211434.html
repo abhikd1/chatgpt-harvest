@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lossless Capture Viewer</title>
+    <script>
+        // CRITICAL: Load theme BEFORE render to prevent FOUC
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <style>
+        /* 
+           ❄️ FROZEN VIEWPORT SHELL
+           Respects inlined styles from ChatGPT capture.
+        */
+
+        :root {
+            --bg-page: #ffffff;
+            /* Light Default */
+            --text-primary: #0d0d0d;
+            --font-sans: "Söhne", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        html[data-theme="dark"] {
+            --bg-page: #0f0f10;
+            /* ChatGPT Dark */
+            --text-primary: #e5e7eb;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            transition: background-color 0.2s;
+        }
+
+        .container {
+            max-width: 48rem;
+            margin: 0 auto;
+            padding: 4rem 1.5rem;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: sans-serif;
+            font-size: 0.85em;
+            z-index: 100;
+        }
+
+        html[data-theme="dark"] .theme-toggle {
+            background: #1f2937;
+            border-color: #374151;
+            color: white;
+        }
+
+        /* Metadata banner */
+        .metadata {
+            font-size: 0.8em;
+            color: #9ca3af;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #374151;
+            font-family: sans-serif;
+        }
+
+        /* Ensure frozen styles aren't squashed */
+        .container * {
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">☀️ / 🌙</button>
+
+    <div class="container">
+        <!-- Content will be injected here -->
+        
+        <div class="metadata">
+            <strong>Source:</strong> Selection • 
+            <strong>Captured:</strong> 2026-01-14 21:14:34
+        </div>
+        <h2 data-start="2442" data-end="2490" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">hy your current system only preserves emojis</h2>
+<p data-start="2492" data-end="2500" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">Because:</p>
+<div class="TyagGW_tableContainer" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><div tabindex="-1" class="group TyagGW_tableWrapper flex flex-col-reverse w-fit" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><table data-start="2502" data-end="2701" class="w-fit min-w-(--thread-content-width)" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><thead data-start="2502" data-end="2555" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><tr data-start="2502" data-end="2555" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><th data-start="2502" data-end="2511" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">Format</th><th data-start="2511" data-end="2520" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">Emojis</th><th data-start="2520" data-end="2527" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">Bold</th><th data-start="2527" data-end="2536" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">Tables</th><th data-start="2536" data-end="2545" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">Colors</th><th data-start="2545" data-end="2555" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">Layout</th></tr></thead><tbody data-start="2607" data-end="2701" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><tr data-start="2607" data-end="2637" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><td data-start="2607" data-end="2616" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><code data-start="2609" data-end="2615" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">.txt</code></td><td data-start="2616" data-end="2620" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">✅</td><td data-start="2620" data-end="2624" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">❌</td><td data-start="2624" data-end="2628" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">❌</td><td data-start="2628" data-end="2632" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">❌</td><td data-start="2632" data-end="2637" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">❌</td></tr><tr data-start="2638" data-end="2669" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><td data-start="2638" data-end="2646" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><code data-start="2640" data-end="2645" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">.md</code></td><td data-start="2646" data-end="2650" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">✅</td><td data-start="2650" data-end="2655" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">⚠️</td><td data-start="2655" data-end="2660" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">⚠️</td><td data-start="2660" data-end="2664" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">❌</td><td data-start="2664" data-end="2669" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">❌</td></tr><tr data-start="2670" data-end="2701" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><td data-start="2670" data-end="2680" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; "><code data-start="2672" data-end="2679" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">.html</code></td><td data-start="2680" data-end="2684" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">✅</td><td data-start="2684" data-end="2688" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">✅</td><td data-start="2688" data-end="2692" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">✅</td><td data-start="2692" data-end="2696" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">✅</td><td data-start="2696" data-end="2701" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; border: ; ">✅</td></tr></tbody></table></div></div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            if (current === 'dark') {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+    </script>
+</body>
+
+</html>

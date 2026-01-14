@@ -89,7 +89,7 @@ javascript: (function () {
     }
 
     // Send to server
-    fetch('http://localhost:8765', {
+    fetch('http://localhost:8766', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

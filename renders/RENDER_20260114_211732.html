@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lossless Capture Viewer</title>
+    <script>
+        // CRITICAL: Load theme BEFORE render to prevent FOUC
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <style>
+        /* 
+           🎨 CHATGPT VISUAL FIDELITY SCHEMA (STRICT)
+           Implementation of the 1:1 Engineering Reference
+        */
+
+        :root {
+            /* 1. COLORS (DARK MODE BY DEFAULT AS REQUESTED) */
+            --bg-page: #0f0f10;
+            --text-primary: #e5e7eb;
+            --text-secondary: #9ca3af;
+            --code-bg: #111827;
+            --code-text: #e5e7eb;
+            --inline-code-bg: #1f2937;
+            --border-color: #374151;
+
+            /* 2. FONTS (MOST IMPORTANT) */
+            --font-sans: "Söhne", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        /* Support for Light Mode if requested via toggle */
+        html[data-theme="light"] {
+            --bg-page: #ffffff;
+            --text-primary: #0d0d0d;
+            --text-secondary: #6b7280;
+            --code-bg: #f9fafb;
+            --code-text: #111827;
+            --inline-code-bg: #f3f4f6;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 16px;
+            /* SCHEMA: 16px */
+            line-height: 1.75;
+            /* SCHEMA: 1.75 (CRITICAL FOR SPACING) */
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 48rem;
+            margin: 0 auto;
+            padding: 4rem 1.5rem;
+            min-height: 100vh;
+        }
+
+        /* 3. TYPOGRAPHY & SPACING */
+        p,
+        ul,
+        ol,
+        blockquote,
+        table,
+        pre {
+            margin-bottom: 1.5rem;
+            /* Better flow spacing */
+        }
+
+        /* SCHEMA: Headings are same size as body, 600 weight */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        strong {
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.75;
+            color: var(--text-primary);
+        }
+
+        /* 4. CODE BLOCKS - THE BIGGEST ISSUE BLOCK */
+        pre {
+            background-color: var(--code-bg) !important;
+            color: var(--code-text) !important;
+            padding: 12px 14px;
+            /* SCHEMA: 12px 14px */
+            border-radius: 8px;
+            /* SCHEMA: 8px */
+            font-family: var(--font-mono);
+            font-size: 14px;
+            /* SCHEMA: 14px */
+            line-height: 1.6;
+            /* SCHEMA: 1.6 */
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: inherit;
+        }
+
+        /* Inline Code */
+        :not(pre)>code {
+            background-color: var(--inline-code-bg);
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+
+        /* 5. SYNTAX COLORS (MUTED GPT STYLE) */
+        .mtk1 {
+            color: var(--text-primary);
+        }
+
+        /* Default */
+        .mtk3 {
+            color: #93c5fd;
+        }
+
+        /* Keywords (Light Blue) */
+        .mtk5 {
+            color: #86efac;
+        }
+
+        /* Strings (Mint Green) */
+        .mtk8 {
+            color: #6b7280;
+        }
+
+        /* Comments (Quiet Gray) */
+        .mtk6 {
+            color: #fca5a5;
+        }
+
+        /* Numbers (Soft Red) */
+        .mtk11 {
+            color: #c4b5fd;
+        }
+
+        /* Functions (Soft Purple) */
+
+        /* Light Mode Highlighting Adjustment */
+        html[data-theme="light"] .mtk3 {
+            color: #2563eb;
+        }
+
+        html[data-theme="light"] .mtk5 {
+            color: #16a34a;
+        }
+
+        /* 6. TABLES - MINIMAL & FLAT */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            border: 1px solid var(--border-color);
+        }
+
+        th,
+        td {
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        /* Metadata & Controls */
+        .metadata {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 8px 16px;
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-family: var(--font-sans);
+            font-size: 0.8em;
+            z-index: 1000;
+        }
+    </style>
+</head>
+
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">☀️ / 🌙</button>
+
+    <div class="container">
+        <!-- Content will be injected here -->
+        
+        <div class="metadata">
+            <strong>Source:</strong> Selection • 
+            <strong>Captured:</strong> 2026-01-14 21:17:32
+        </div>
+        <ul data-start="1702" data-end="2071"><li data-start="1702" data-end="1908"><ul data-start="1740" data-end="1908"><li data-start="1785" data-end="1908"><ul data-start="1803" data-end="1908"><li data-start="1828" data-end="1838"><p data-start="1830" data-end="1838"></p>
+</li>
+<li data-start="1843" data-end="1850">
+<p data-start="1845" data-end="1850">lists</p>
+</li>
+<li data-start="1855" data-end="1863">
+<p data-start="1857" data-end="1863">tables</p>
+</li>
+<li data-start="1868" data-end="1881">
+<p data-start="1870" data-end="1881">code blocks</p>
+</li>
+<li data-start="1886" data-end="1894">
+<p data-start="1888" data-end="1894">emojis</p>
+</li>
+<li data-start="1899" data-end="1908">
+<p data-start="1901" data-end="1908">spacing</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li data-start="1909" data-end="2071">
+<p data-start="1911" data-end="1948">When you open that file in a browser:</p>
+<ul data-start="1951" data-end="2071">
+<li data-start="1951" data-end="2001">
+<p data-start="1953" data-end="2001">it <strong data-start="1956" data-end="1982">looks almost identical</strong> to ChatGPT’s reply</p>
+</li>
+<li data-start="2004" data-end="2028">
+<p data-start="2006" data-end="2028">clean white background</p>
+</li>
+<li data-start="2031" data-end="2045">
+<p data-start="2033" data-end="2045">proper fonts</p>
+</li>
+<li data-start="2048" data-end="2071">
+<p data-start="2050" data-end="2071">same layout hierarchy</p>
+</li>
+</ul>
+</li>
+</ul>
+<p data-start="2073" data-end="2076">So:</p>
+<blockquote data-start="2077" data-end="2137">
+<p data-start="2079" data-end="2137">“What you see on ChatGPT ≈ what you see in the saved file”</p>
+</blockquote>
+<hr data-start="2139" data-end="2142">
+<h3 data-start="2144" data-end="2183">What it DOES NOT mean ❌ (important)</h3>
+<p data-start="2185" data-end="2206">It does <strong data-start="2193" data-end="2200">NOT</strong> mean:</p>
+<ul data-start="2207" data-end="2349">
+<li data-start="2207" data-end="2263">
+<p data-start="2209" data-end="2263">You can paste it into Notepad and keep the same look ❌</p>
+</li>
+<li data-start="2264" data-end="2302">
+<p data-start="2266" data-end="2302">Plain <code data-start="2272" data-end="2278">.txt</code> can look like ChatGPT ❌</p>
+</li>
+<li data-start="2303" data-end="2349">
+<p data-start="2305" data-end="2349">Markdown alone can store colors and layout ❌</p>
+</li>
+</ul>
+<p data-start="2351" data-end="2435"><strong data-start="2351" data-end="2393">Exact visual look requires HTML + CSS.</strong><br>
+There is no way around this in computing.</p>
+<hr data-start="2437" data-end="2440">
+<h2 data-start="2442" data-end="2490">Why your current system only preserves emojis</h2>
+<p data-start="2492" data-end="2500">Because:</p>
+<div class="TyagGW_tableContainer"><div tabindex="-1" class="group TyagGW_tableWrapper flex flex-col-reverse w-fit"><table data-start="2502" data-end="2701" class="w-fit min-w-(--thread-content-width)"><thead data-start="2502" data-end="2555"><tr data-start="2502" data-end="2555"><th data-start="2502" data-end="2511" data-col-size="sm">Format</th><th data-start="2511" data-end="2520" data-col-size="sm">Emojis</th><th data-start="2520" data-end="2527" data-col-size="sm">Bold</th><th data-start="2527" data-end="2536" data-col-size="sm">Tables</th><th data-start="2536" data-end="2545" data-col-size="sm">Colors</th><th data-start="2545" data-end="2555" data-col-size="sm">Layout</th></tr></thead><tbody data-start="2607" data-end="2701"><tr data-start="2607" data-end="2637"><td data-start="2607" data-end="2616" data-col-size="sm"><code data-start="2609" data-end="2615">.txt</code></td><td data-start="2616" data-end="2620" data-col-size="sm">✅</td><td data-start="2620" data-end="2624" data-col-size="sm">❌</td><td data-start="2624" data-end="2628" data-col-size="sm">❌</td><td data-start="2628" data-end="2632" data-col-size="sm">❌</td><td data-start="2632" data-end="2637" data-col-size="sm">❌</td></tr><tr data-start="2638" data-end="2669"><td data-start="2638" data-end="2646" data-col-size="sm"><code data-start="2640" data-end="2645">.md</code></td><td data-start="2646" data-end="2650" data-col-size="sm">✅</td><td data-start="2650" data-end="2655" data-col-size="sm">⚠️</td><td data-start="2655" data-end="2660" data-col-size="sm">⚠️</td><td data-start="2660" data-end="2664" data-col-size="sm">❌</td><td data-start="2664" data-end="2669" data-col-size="sm">❌</td></tr><tr data-start="2670" data-end="2701"><td data-start="2670" data-end="2680" data-col-size="sm"><code data-start="2672" data-end="2679">.html</code></td><td data-start="2680" data-end="2684" data-col-size="sm">✅</td><td data-start="2684" data-end="2688" data-col-size="sm">✅</td><td data-start="2688" data-end="2692" data-col-size="sm">✅</td><td data-start="2692" data-end="2696" data-col-size="sm">✅</td><td data-start="2696" data-end="2701" data-col-size="sm">✅</td></tr></tbody></table><div class="sticky h-0 select-none end-(--thread-content-margin) self-end"><div class="absolute end-0 flex items-end" style="height: 33px;"><span class="" data-state="closed"></span></div></div></div></div>
+<p data-start="2703" data-end="2721">So your system is:</p>
+<ul data-start="2722" data-end="2812">
+<li data-start="2722" data-end="2745">
+<p data-start="2724" data-end="2745"><strong data-start="2724" data-end="2745">working correctly</strong></p>
+</li>
+<li data-start="2746" data-end="2781">
+<p data-start="2748" data-end="2781">but you’re storing <strong data-start="2767" data-end="2781">plain text</strong></p>
+</li>
+<li data-start="2782" data-end="2812">
+<p data-start="2784" data-end="2812">not <strong data-start="2788" data-end="2812">renderable structure</strong></p>
+</li>
+</ul>
+<hr data-start="2814" data-end="2817">
+<h2 data-start="2819" data-end="2873">What this setup actually gives you (powerful truth)</h2>
+<p data-start="2875" data-end="2896">This setup gives you:</p>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            if (current === 'dark') {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+    </script>
+</body>
+
+</html>

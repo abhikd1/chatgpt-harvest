@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lossless Capture Viewer</title>
+    <script>
+        // CRITICAL: Load theme BEFORE render to prevent FOUC
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <style>
+        /* 
+           🎨 REALITY-BASED CHATGPT STYLING 
+           Surgical match for chatgpt.com visual state.
+        */
+
+        :root {
+            /* Light Mode */
+            --bg-page: #ffffff;
+            --text-primary: #0d0d0d;
+            --text-secondary: #5d5d5d;
+            --code-bg: #f6f8fa;
+            --code-text: #0d0d0d;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --accent-color: #10a37f;
+
+            /* ChatGPT EXACT FONT STACK */
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        html[data-theme="dark"] {
+            /* Dark Mode */
+            --bg-page: #0d0d0d;
+            --text-primary: #ececec;
+            --text-secondary: #b4b4b4;
+            --code-bg: #0f172a;
+            --code-text: #e0e0e0;
+            --border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 48rem;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+            min-height: 100vh;
+        }
+
+        /* typography */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-weight: 600;
+            line-height: 1.3;
+            margin-top: 1.5em;
+            margin-bottom: 0.75em;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1.25em;
+        }
+
+        strong {
+            font-weight: 600;
+        }
+
+        ul,
+        ol {
+            margin-bottom: 1.25em;
+            padding-left: 1.5em;
+        }
+
+        li {
+            margin-bottom: 0.5em;
+        }
+
+        /* Code Blocks - Scoped & Faithful */
+        pre {
+            background-color: var(--code-bg) !important;
+            color: var(--code-text) !important;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 0.875em;
+            line-height: 1.6;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.875em;
+        }
+
+        /* Syntax Highlighting (ChatGPT Style) - Global because we strip the mono wrapper */
+        .mtk1 {
+            color: var(--text-primary);
+        }
+
+        /* Default */
+        .mtk3 {
+            color: #569cd6;
+        }
+
+        /* Keywords (Blue) */
+        .mtk5 {
+            color: #ce9178;
+        }
+
+        /* Strings (Orange/Brown) */
+        .mtk8 {
+            color: #6a9955;
+        }
+
+        /* Comments (Green) */
+        .mtk7 {
+            color: #d7ba7d;
+        }
+
+        /* Brackets (Yellow) */
+        .mtk11 {
+            color: #dcdcaa;
+        }
+
+        /* Functions (Light Yellow) */
+        .mtk6 {
+            color: #b5cea8;
+        }
+
+        /* Numbers (Light Green) */
+
+        /* Light Mode Highlighting Overrides */
+        html:not([data-theme="dark"]) .mtk3 {
+            color: #0000ff;
+        }
+
+        html:not([data-theme="dark"]) .mtk5 {
+            color: #a31515;
+        }
+
+        html:not([data-theme="dark"]) .mtk8 {
+            color: #008000;
+        }
+
+        /* Visibility & Performance */
+        .container>* {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: var(--font-sans);
+            font-size: 0.85em;
+            color: var(--text-primary);
+        }
+
+        .metadata {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">☀️ / 🌙</button>
+
+    <div class="container">
+        <!-- Content will be injected here -->
+        
+        <div class="metadata">
+            <strong>Source:</strong> Selection • 
+            <strong>Captured:</strong> 2026-01-14 21:04:26
+        </div>
+        <h2 data-start="3017" data-end="3060" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">5️⃣ SYNTAX COLORS (SUBTLE, NOT COLORFUL)</h2>
+<p data-start="3062" data-end="3108" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">ChatGPT syntax highlighting is <strong data-start="3093" data-end="3107" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">very muted</strong>.</p>
+<p data-start="3110" data-end="3139" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">Example theme (conceptually):</p>
+<div class="TyagGW_tableContainer" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><div tabindex="-1" class="group TyagGW_tableWrapper flex flex-col-reverse w-fit" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><table data-start="3141" data-end="3294" class="w-fit min-w-(--thread-content-width)" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><thead data-start="3141" data-end="3158" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><tr data-start="3141" data-end="3158" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><th data-start="3141" data-end="3149" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">Token</th><th data-start="3149" data-end="3158" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">Color</th></tr></thead><tbody data-start="3171" data-end="3294" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><tr data-start="3171" data-end="3195" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><td data-start="3171" data-end="3182" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">Keywords</td><td data-start="3182" data-end="3195" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><code data-start="3184" data-end="3193" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">#93c5fd</code></td></tr><tr data-start="3196" data-end="3219" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><td data-start="3196" data-end="3206" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">Strings</td><td data-col-size="sm" data-start="3206" data-end="3219" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><code data-start="3208" data-end="3217" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">#86efac</code></td></tr><tr data-start="3220" data-end="3244" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><td data-start="3220" data-end="3231" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">Comments</td><td data-start="3231" data-end="3244" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><code data-start="3233" data-end="3242" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">#6b7280</code></td></tr><tr data-start="3245" data-end="3268" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><td data-start="3245" data-end="3255" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">Numbers</td><td data-start="3255" data-end="3268" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><code data-start="3257" data-end="3266" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">#fca5a5</code></td></tr><tr data-start="3269" data-end="3294" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><td data-start="3269" data-end="3281" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">Functions</td><td data-start="3281" data-end="3294" data-col-size="sm" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><code data-start="3283" data-end="3292" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">#c4b5fd</code></td></tr></tbody></table><div class="sticky h-0 select-none end-(--thread-content-margin) self-end" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><div class="absolute end-0 flex items-end" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><span class="" data-state="closed" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "></span></div></div></div></div>
+<p data-start="3296" data-end="3346" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">👉 If your code looks <strong data-start="3318" data-end="3333" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">rainbow-ish</strong>, it’s wrong.</p>
+<p data-start="3348" data-end="3395" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">ChatGPT prioritizes <strong data-start="3368" data-end="3383" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">readability</strong>, not color.</p>
+<hr data-start="3397" data-end="3400" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">
+<h2 data-start="3402" data-end="3447" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">6️⃣ COPY CODE BUTTON — HOW IT REALLY WORKS</h2>
+<h3 data-start="3449" data-end="3465" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">UI behavior:</h3>
+<ul data-start="3466" data-end="3549" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">
+<li data-start="3466" data-end="3493" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">
+<p data-start="3468" data-end="3493" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">Appears <strong data-start="3476" data-end="3493" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">only on hover</strong></p>
+</li>
+<li data-start="3494" data-end="3526" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">
+<p data-start="3496" data-end="3526" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">Top-right corner of code block</p>
+</li>
+<li data-start="3527" data-end="3549" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">
+<p data-start="3529" data-end="3549" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">Not part of code DOM</p>
+</li>
+</ul>
+<h3 data-start="3551" data-end="3573" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">Technical reality:</h3>
+<ul data-start="3574" data-end="3686" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">
+<li data-start="3574" data-end="3611" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">
+<p data-start="3576" data-end="3611" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">Button is <strong data-start="3586" data-end="3611" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">absolutely positioned</strong></p>
+</li>
+<li data-start="3612" data-end="3644" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">
+<p data-start="3614" data-end="3644" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">Code block itself is untouched</p>
+</li>
+<li data-start="3645" data-end="3686" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">
+<p data-start="3647" data-end="3686" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">Copy reads from <strong data-start="3663" data-end="3676" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">innerText</strong>, not HTML</p>
+</li>
+</ul>
+<p data-start="3688" data-end="3708" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">Typical positioning:</p>
+<pre class="overflow-visible! px-0!" data-start="3709" data-end="3761" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">css</div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "></div></div><div class="overflow-y-auto p-4" dir="ltr" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><code class="whitespace-pre! language-css" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><span class="hljs-attribute" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">position</span></span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">: absolute;
+</span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><span class="hljs-attribute" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">top</span></span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">: </span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><span class="hljs-number" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">6px</span></span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">;
+</span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><span class="hljs-attribute" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">right</span></span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">: </span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; "><span class="hljs-number" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">8px</span></span><span style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">;
+</span></span></code></div></div></pre>
+<p data-start="3763" data-end="3842" style="font-family: ; font-size: ; font-weight: ; line-height: ; color: ; background-color: ; padding: ; margin: ; border-radius: ; border: ; display: ; position: ; ">👉 If you embed the button into the code block HTML, it will never feel native.</p>
+
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            if (current === 'dark') {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+    </script>
+</body>
+
+</html>

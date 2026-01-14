@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lossless Capture Viewer</title>
+    <script>
+        // CRITICAL: Load theme BEFORE render to prevent FOUC
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <style>
+        /* 
+           🎨 THE SOUL OF READABILITY 
+           Inspired by the best AI interfaces (ChatGPT, Claude, Gemini)
+           Focus: Clarity, Typography, Whitespace.
+        */
+
+        :root {
+            /* Light Mode Variables */
+            --bg-page: #ffffff;
+            --bg-content: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #5d5d5d;
+            --code-bg: #f6f8fa;
+            /* GitHub-style light code var */
+            --code-text: #24292e;
+            --border-color: #e1e4e8;
+            --accent-color: #10a37f;
+            /* ChatGPT Greenish */
+            --font-sans: "Söhne", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: "Söhne Mono", "Monaco", "Andale Mono", monospace;
+            --max-width: 48rem;
+            /* 768px - Optimal reading width */
+        }
+
+        html[data-theme="dark"] {
+            /* Dark Mode Variables */
+            --bg-page: #1e1e1e;
+            /* VS Code dark is nice, let's go darker like ChatGPT */
+            --bg-page: #101010;
+            /* Near black */
+            --bg-content: #101010;
+            --text-primary: #ececec;
+            --text-secondary: #a0a0a0;
+            --code-bg: #000000;
+            /* Deep black for code */
+            --code-text: #e0e0e0;
+            --border-color: #333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            line-height: 1.75;
+            /* Generous line height for reading */
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* The Reading Container */
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+            background-color: var(--bg-content);
+            min-height: 100vh;
+        }
+
+        /* Typography */
+        h1,
+        h2,
+        h3,
+        h4 {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-top: 1.5em;
+            margin-bottom: 0.75em;
+            line-height: 1.3;
+        }
+
+        h1 {
+            font-size: 2em;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5em;
+        }
+
+        h2 {
+            font-size: 1.5em;
+        }
+
+        h3 {
+            font-size: 1.25em;
+        }
+
+        p {
+            margin-bottom: 1.25em;
+        }
+
+        strong {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        em {
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        /* Lists */
+        ul,
+        ol {
+            margin-bottom: 1.25em;
+            padding-left: 1.5em;
+        }
+
+        li {
+            margin-bottom: 0.5em;
+        }
+
+        /* Links */
+        a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* CODE BLOCKS - The Star of the Show */
+        pre {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.25rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border-color);
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+            line-height: 1.6;
+            white-space: pre;
+            /* Important for preserving code structure */
+        }
+
+        /* Inline Code */
+        code:not(pre code) {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.95em;
+        }
+
+        th,
+        td {
+            border: 1px solid var(--border-color);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        /* Toggle Button */
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: var(--font-sans);
+            font-size: 0.85em;
+            color: var(--text-primary);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-toggle:hover {
+            opacity: 0.8;
+        }
+
+        /* Utility */
+        hr {
+            border: 0;
+            border-top: 1px solid var(--border-color);
+            margin: 2rem 0;
+        }
+
+        .metadata {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* 🔒 CRITICAL: Isolate captured content styles */
+        .container>div:not(.metadata) {
+            all: initial;
+            display: block;
+            font-family: var(--font-sans);
+            color: var(--text-primary);
+            line-height: 1.75;
+            font-size: 16px;
+        }
+
+        /* Re-apply template styles to captured content */
+        .container>div:not(.metadata) * {
+            font-family: inherit;
+        }
+
+        /* Syntax Highlighting Colors (Soft & Balanced) */
+        .hljs-keyword {
+            color: #d73a49;
+        }
+
+        /* Red */
+        html[data-theme="dark"] .hljs-keyword {
+            color: #ff7b72;
+        }
+
+        .hljs-string {
+            color: #032f62;
+        }
+
+        /* Blue */
+        html[data-theme="dark"] .hljs-string {
+            color: #a5d6ff;
+        }
+
+        .hljs-comment {
+            color: #6a737d;
+            font-style: italic;
+        }
+
+        html[data-theme="dark"] .hljs-comment {
+            color: #8b949e;
+        }
+
+        .hljs-function {
+            color: #6f42c1;
+        }
+
+        /* Purple */
+        html[data-theme="dark"] .hljs-function {
+            color: #d2a8ff;
+        }
+
+        .hljs-built_in {
+            color: #e36209;
+        }
+
+        /* Orange */
+        html[data-theme="dark"] .hljs-built_in {
+            color: #ffa657;
+        }
+    </style>
+</head>
+
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">☀️ / 🌙</button>
+
+    <div class="container">
+        <!-- Content will be injected here -->
+        
+        <div class="metadata">
+            <strong>Source:</strong> Selection • 
+            <strong>Captured:</strong> 2026-01-14 17:43:17
+        </div>
+        <span>
+- Capture syntax highlighting </span><span><span class="hljs-keyword">as</span></span><span> rendered (colors included)
+- </span><span><span class="hljs-keyword">Preserve</span></span><span> background layers separately </span><span><span class="hljs-keyword">from</span></span><span> </span><span><span class="hljs-keyword">text</span></span><span>
+- </span><span><span class="hljs-keyword">Do</span></span><span> </span><span><span class="hljs-built_in">NOT</span></span><span> re-run syntax highlighters
+- </span><span><span class="hljs-keyword">Do</span></span><span> </span><span><span class="hljs-built_in">NOT</span></span><span> normalize whitespace
+- </span><span><span class="hljs-keyword">Preserve</span></span><span> scrollb</span>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            if (current === 'dark') {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+    </script>
+</body>
+
+</html>

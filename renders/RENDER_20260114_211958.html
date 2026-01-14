@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lossless Capture Viewer</title>
+    <script>
+        // CRITICAL: Load theme BEFORE render to prevent FOUC
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <style>
+        /* 
+           🎨 CHATGPT VISUAL FIDELITY SCHEMA (STRICT)
+           Implementation of the 1:1 Engineering Reference
+        */
+
+        :root {
+            /* 1. COLORS (LIGHT MODE BY DEFAULT) */
+            --bg-page: #ffffff;
+            --text-primary: #0d0d0d;
+            --text-secondary: #6b7280;
+            --code-bg: #f9fafb;
+            --code-text: #111827;
+            --inline-code-bg: #f3f4f6;
+            --border-color: #e5e7eb;
+
+            /* 2. FONTS (MOST IMPORTANT) */
+            --font-sans: "Söhne", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        /* Support for Dark Mode via Toggle */
+        html[data-theme="dark"] {
+            --bg-page: #0f0f10;
+            --text-primary: #e5e7eb;
+            --text-secondary: #9ca3af;
+            --code-bg: #111827;
+            --code-text: #e5e7eb;
+            --inline-code-bg: #1f2937;
+            --border-color: #374151;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 16px;
+            /* SCHEMA: 16px */
+            line-height: 1.75;
+            /* SCHEMA: 1.75 (CRITICAL FOR SPACING) */
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 48rem;
+            margin: 0 auto;
+            padding: 4rem 1.5rem;
+            min-height: 100vh;
+        }
+
+        /* 3. TYPOGRAPHY & SPACING */
+        p,
+        ul,
+        ol,
+        blockquote,
+        table,
+        pre {
+            margin-bottom: 1.5rem;
+            /* Better flow spacing */
+        }
+
+        /* SCHEMA: Headings are same size as body, 600 weight */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        strong {
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.75;
+            color: var(--text-primary);
+        }
+
+        /* 4. CODE BLOCKS - THE BIGGEST ISSUE BLOCK */
+        pre {
+            background-color: var(--code-bg) !important;
+            color: var(--code-text) !important;
+            padding: 12px 14px;
+            /* SCHEMA: 12px 14px */
+            border-radius: 8px;
+            /* SCHEMA: 8px */
+            font-family: var(--font-mono);
+            font-size: 14px;
+            /* SCHEMA: 14px */
+            line-height: 1.6;
+            /* SCHEMA: 1.6 */
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: inherit;
+        }
+
+        /* Inline Code */
+        :not(pre)>code {
+            background-color: var(--inline-code-bg);
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+
+        /* Syntax Highlighting Adjustment */
+        html[data-theme="dark"] .mtk3 {
+            color: #93c5fd;
+        }
+
+        html[data-theme="dark"] .mtk5 {
+            color: #86efac;
+        }
+
+        /* Light Mode Default Syntax (Matching GPT Light) */
+        .mtk1 {
+            color: var(--text-primary);
+        }
+
+        .mtk3 {
+            color: #2563eb;
+        }
+
+        /* Keywords (Blue) */
+        .mtk5 {
+            color: #16a34a;
+        }
+
+        /* Strings (Green) */
+        .mtk8 {
+            color: #6b7280;
+        }
+
+        /* Comments */
+        .mtk6 {
+            color: #d97706;
+        }
+
+        /* Numbers */
+        .mtk11 {
+            color: #7c3aed;
+        }
+
+        /* Functions */
+
+        /* 6. TABLES - MINIMAL & FLAT */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            border: 1px solid var(--border-color);
+        }
+
+        th,
+        td {
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        /* Metadata & Controls */
+        .metadata {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 8px 16px;
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-family: var(--font-sans);
+            font-size: 0.8em;
+            z-index: 1000;
+        }
+    </style>
+</head>
+
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">☀️ / 🌙</button>
+
+    <div class="container">
+        <!-- Content will be injected here -->
+        
+        <div class="metadata">
+            <strong>Source:</strong> Selection • 
+            <strong>Captured:</strong> 2026-01-14 21:19:58
+        </div>
+        <h2 data-start="297" data-end="335">1️⃣ First, a HARD TRUTH (important)</h2>
+<h3 data-start="337" data-end="403">⚠️ You CANNOT perfectly “copy ChatGPT UI” using only saved CSS</h3>
+<p data-start="405" data-end="409">Why?</p>
+<p data-start="411" data-end="452">Because ChatGPT (and Gemini, Claude) use:</p>
+<ul data-start="454" data-end="597">
+<li data-start="454" data-end="473">
+<p data-start="456" data-end="473"><strong data-start="456" data-end="473">React runtime</strong></p>
+</li>
+<li data-start="474" data-end="504">
+<p data-start="476" data-end="504"><strong data-start="476" data-end="504">Dynamic Tailwind classes</strong></p>
+</li>
+<li data-start="505" data-end="538">
+<p data-start="507" data-end="538"><strong data-start="507" data-end="538">JS-based layout + hydration</strong></p>
+</li>
+<li data-start="539" data-end="567">
+<p data-start="541" data-end="567"><strong data-start="541" data-end="567">Internal design tokens</strong></p>
+</li>
+<li data-start="568" data-end="597">
+<p data-start="570" data-end="597"><strong data-start="570" data-end="597">Private component trees</strong></p>
+</li>
+</ul>
+<p data-start="599" data-end="662">What you pasted is <strong data-start="618" data-end="634">computed CSS</strong>, not the <strong data-start="644" data-end="661">source system</strong>.</p>
+<p data-start="664" data-end="675">That means:</p>
+<ul data-start="676" data-end="805">
+<li data-start="676" data-end="700">
+<p data-start="678" data-end="700">✔️ It can LOOK similar</p>
+</li>
+<li data-start="701" data-end="735">
+<p data-start="703" data-end="735">❌ It can NEVER be 100% identical</p>
+</li>
+<li data-start="736" data-end="805">
+<p data-start="738" data-end="805">❌ You cannot “rebuild ChatGPT” just by pasting CSS into another app</p>
+</li>
+</ul>
+<p data-start="807" data-end="835">👉 This is not your mistake.</p>
+<hr data-start="837" data-end="840">
+<h2 data-start="842" data-end="900">2️⃣ What EXACTLY is going wrong in your current result?</h2>
+<p data-start="902" data-end="929">You said this key sentence:</p>
+<blockquote data-start="931" data-end="972">
+<p data-start="933" data-end="972">“It looks like ChatGPT but not exactly”</p>
+</blockquote>
+<h3 data-start="974" data-end="990">The reasons:</h3>
+<ol data-start="992" data-end="1403">
+<li data-start="992" data-end="1074">
+<p data-start="995" data-end="1013"><strong data-start="995" data-end="1013">Fonts mismatch</strong></p>
+<ul data-start="1017" data-end="1074">
+<li data-start="1017" data-end="1074">
+<p data-start="1019" data-end="1074">ChatGPT uses platform font fallback + Apple Color Emoji</p>
+</li>
+</ul>
+</li>
+<li data-start="1075" data-end="1146">
+<p data-start="1078" data-end="1103"><strong data-start="1078" data-end="1103">Spacing tokens differ</strong></p>
+<ul data-start="1107" data-end="1146">
+<li data-start="1107" data-end="1146">
+<p data-start="1109" data-end="1146"><code data-start="1109" data-end="1120">--spacing</code> is contextual, not static</p>
+</li>
+</ul>
+</li>
+<li data-start="1147" data-end="1236">
+<p data-start="1150" data-end="1179"><strong data-start="1150" data-end="1179">Markdown renderer missing</strong></p>
+<ul data-start="1183" data-end="1236">
+<li data-start="1183" data-end="1236">
+<p data-start="1185" data-end="1236">ChatGPT uses <strong data-start="1198" data-end="1236">custom Markdown + React components</strong></p>
+</li>
+</ul>
+</li>
+<li data-start="1237" data-end="1319">
+<p data-start="1240" data-end="1276"><strong data-start="1240" data-end="1276">Code highlighting engine missing</strong></p>
+<ul data-start="1280" data-end="1319">
+<li data-start="1280" data-end="1319">
+<p data-start="1282" data-end="1319">Prism / Shiki styles not fully loaded</p>
+</li>
+</ul>
+</li>
+<li data-start="1320" data-end="1403">
+<p data-start="1323" data-end="1352"><strong data-start="1323" data-end="1352">Container context missing</strong></p>
+<ul data-start="1356" data-end="1403">
+<li data-start="1356" data-end="1403">
+<p data-start="1358" data-end="1403">Many styles depend on parent layout, not body</p>
+</li>
+</ul>
+</li>
+</ol>
+<p data-start="1405" data-end="1428">So your output becomes:</p>
+<ul data-start="1429" data-end="1486">
+<li data-start="1429" data-end="1456">
+<p data-start="1431" data-end="1456">❌ “Plain but styled text”</p>
+</li>
+<li data-start="1457" data-end="1486">
+<p data-start="1459" data-end="1486">Not ❌ “ChatGPT response UI”</p>
+</li>
+</ul>
+<hr data-start="1488" data-end="1491">
+<h2 data-start="1493" data-end="1541">3️⃣ The CORRECT mental model (very important)</h2>
+<h3 data-start="1543" data-end="1561">Stop thinking:</h3>
+<blockquote data-start="1562" data-end="1592">
+<p data-start="1564" data-end="1592">“How do I copy ChatGPT CSS?”</p>
+</blockquote>
+<h3 data-start="1594" data-end="1613">Start thinking:</h3>
+<blockquote data-start="1614" data-end="1670">
+<p data-start="1616" data-end="1670">“How do I REPRODUCE the ChatGPT <em data-start="1648" data-end="1668">READING EXPERIENCE</em>?”</p>
+</blockquote>
+<p data-start="1672" data-end="1699">This is the <strong data-start="1684" data-end="1698">right goal</strong>.</p>
+<hr data-start="1701" data-end="1704">
+<h2 data-start="1706" data-end="1749">4️⃣ The ONLY 3 REAL OPTIONS (choose one)</h2>
+<h3 data-start="1751" data-end="1786">🥇 OPTION 1 (BEST, RECOMMENDED)</h3>
+<h3 data-start="1787" data-end="1838">🔥 <strong data-start="1794" data-end="1838">HTML SNAPSHOT (what you already started)</strong></h3>
+<p data-start="1840" data-end="1872">This is the <strong data-start="1852" data-end="1864">only way</strong> to get:</p>
+<ul data-start="1874" data-end="1941">
+<li data-start="1874" data-end="1880">
+<p data-start="1876" data-end="1880">Bold</p>
+</li>
+<li data-start="1881" data-end="1889">
+<p data-start="1883" data-end="1889">Emojis</p>
+</li>
+<li data-start="1890" data-end="1898">
+<p data-start="1892" data-end="1898">Tables</p>
+</li>
+<li data-start="1899" data-end="1912">
+<p data-start="1901" data-end="1912">Code colors</p>
+</li>
+<li data-start="1913" data-end="1922">
+<p data-start="1915" data-end="1922">Spacing</p>
+</li>
+<li data-start="1923" data-end="1941">
+<p data-start="1925" data-end="1941">Visual hierarchy</p>
+</li>
+</ul>
+<p data-start="1943" data-end="2054">✅ You already have this with your bookmarklet<br data-start="1988" data-end="1991">
+✅ This is how tools like <strong data-start="2016" data-end="2049">Readwise, Arc, Notion Clipper</strong> work</p>
+<p data-start="2056" data-end="2081"><strong data-start="2056" data-end="2081">Improve it like this:</strong></p>
+<h4 data-start="2083" data-end="2119">Do NOT inject all ChatGPT CSS</h4>
+<p data-start="2120" data-end="2128">Instead:</p>
+<ol data-start="2130" data-end="2257">
+<li data-start="2130" data-end="2184">
+<p data-start="2133" data-end="2141">Capture:</p>
+<ul data-start="2145" data-end="2184">
+<li data-start="2145" data-end="2184">
+<p data-start="2147" data-end="2184"><code data-start="2147" data-end="2158">innerHTML</code> of the response container</p>
+</li>
+</ul>
+</li>
+<li data-start="2185" data-end="2225">
+<p data-start="2188" data-end="2225">Wrap it in a <strong data-start="2201" data-end="2225">minimal viewer shell</strong></p>
+</li>
+<li data-start="2226" data-end="2257">
+<p data-start="2229" data-end="2257">Use <strong data-start="2233" data-end="2257">neutral prose styles</strong></p>
+</li>
+</ol>
+<p data-start="2259" data-end="2297">This is what ChatGPT itself relies on:</p>
+<pre class="overflow-visible! px-0!" data-start="2299" data-end="2600"><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1">css</div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre! language-css"><span><span><span class="hljs-selector-class">.prose</span></span><span> {
+  </span><span><span class="hljs-attribute">max-width</span></span><span>: </span><span><span class="hljs-number">48rem</span></span><span>;
+  </span><span><span class="hljs-attribute">font-family</span></span><span>: system-ui, -apple-system, Segoe UI, Roboto;
+  </span><span><span class="hljs-attribute">line-height</span></span><span>: </span><span><span class="hljs-number">1.75</span></span><span>;
+}
+
+</span><span><span class="hljs-selector-class">.prose</span></span><span> pre {
+  </span><span><span class="hljs-attribute">background</span></span><span>: </span><span><span class="hljs-number">#f6f8fa</span></span><span>;
+  </span><span><span class="hljs-attribute">padding</span></span><span>: </span><span><span class="hljs-number">12px</span></span><span>;
+  </span><span><span class="hljs-attribute">border-radius</span></span><span>: </span><span><span class="hljs-number">8px</span></span><span>;
+  </span><span><span class="hljs-attribute">overflow-x</span></span><span>: auto;
+}
+
+</span><span><span class="hljs-selector-class">.prose</span></span><span> </span><span><span class="hljs-selector-tag">code</span></span><span> {
+  </span><span><span class="hljs-attribute">background</span></span><span>: </span><span><span class="hljs-number">#ececec</span></span><span>;
+  </span><span><span class="hljs-attribute">padding</span></span><span>: </span><span><span class="hljs-number">2px</span></span><span> </span><span><span class="hljs-number">6px</span></span><span>;
+  </span><span><span class="hljs-attribute">border-radius</span></span><span>: </span><span><span class="hljs-number">4px</span></span><span>;
+}
+</span></span></code></div></div></pre>
+<p data-start="2602" data-end="2711">✅ This copies <strong data-start="2616" data-end="2627">meaning</strong>, not fragile internals<br data-start="2650" data-end="2653">
+✅ This is future-proof<br data-start="2675" data-end="2678">
+✅ This is how professionals do </p>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            if (current === 'dark') {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Load saved theme
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+</body>
+
+</html>

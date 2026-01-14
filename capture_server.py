@@ -9,7 +9,7 @@ This script runs a local server that:
 
 import sys
 import os
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import HTTPServer, BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 from pathlib import Path
 from render_capture import save_render
@@ -114,10 +114,10 @@ class CaptureHandler(BaseHTTPRequestHandler):
         pass
 
 
-def start_server(port=8766):
+def run(server_class=ThreadingHTTPServer, handler_class=CaptureHandler, port=8766):
     """Start the capture server"""
     server_address = ('', port)
-    httpd = HTTPServer(server_address, CaptureHandler)
+    httpd = server_class(server_address, handler_class)
     
     print("\n" + "="*60)
     print("🔒 RENDER CAPTURE SERVER (WEB VIEW ENABLED)")
@@ -141,4 +141,4 @@ if __name__ == '__main__':
         except ValueError:
             print("Invalid port number, using default 8766")
     
-    start_server(port)
+    run(port=port)

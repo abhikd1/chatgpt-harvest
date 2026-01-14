@@ -63,6 +63,51 @@ class RenderCaptureManager:
         filename = f"RENDER_{timestamp}.html"
         filepath = self.base_dir / filename
         
+        # 🔥 CRITICAL: Clean Monaco bloat before saving
+        # This makes files load INSTANTLY by removing 8000+ empty divs per code block
+        import re
+        
+        # 🔥 SMART CLEANER: Removes bloat but KEEPS COLORS (mtk classes)
+        # 1. Match the outer Monaco container
+        monaco_outer_pattern = r'<div class="monaco-editor[^>]*>.*?<div class="view-lines"[^>]*>(.*?)</div>.*?</div>\s*</div>\s*</div>\s*</div>\s*</div>'
+        
+        def smart_replace_monaco(match):
+            # matches group(1) = content inside 'view-lines'
+            view_lines_content = match.group(1)
+            
+            # 2. Extract each line of code
+            # Lines are usually <div class="view-line"...>...</div>
+            lines = re.findall(r'<div class="view-line"[^>]*>(.*?)</div>', view_lines_content, re.DOTALL)
+            
+            if not lines:
+                return match.group(0) # Safety fallback
+                
+            # 3. Reconstruct as a clean PRE > CODE block
+            # We join lines with newline char, preserving the colored spans inside
+            cleaned_code = '\n'.join(lines)
+            
+            # 4. Remove empty styling spans to save space (optional, but good)
+            cleaned_code = re.sub(r'<span></span>', '', cleaned_code)
+            
+            return f'<pre><code class="monaco-editor-background">{cleaned_code}</code></pre>'
+
+        # 🔥 SMART CLEANER: DISABLED AGAIN (Regex is unsafe)
+        # Priority: VISIBILITY. We will optimize later with DOM parser.
+        # monaco_outer_pattern = r'<div class="monaco-editor[^>]*>.*?<div class="view-lines"[^>]*>(.*?)</div>.*?</div>\s*</div>\s*</div>\s*</div>\s*</div>'
+        # html_content = re.sub(monaco_outer_pattern, smart_replace_monaco, html_content, flags=re.DOTALL)
+        
+        # 2. Remove SVG icons (hefty UI elements) - DISABLED FOR SAFETY
+        # html_content = re.sub(r'<svg[^>]*width="1em"[^>]*>.*?</svg>', '', html_content, flags=re.DOTALL)
+        
+        # 3. Remove empty layout divs - KEEP THIS
+        html_content = re.sub(r'<div[^>]*>\s*</div>', '', html_content)
+        
+        # 2. Remove SVG icons (hefty download buttons etc)
+        # html_content = re.sub(r'<svg[^>]*width="1em"[^>]*>.*?</svg>', '', html_content, flags=re.DOTALL)
+        
+        # 3. Remove empty layout divs
+        # html_content = re.sub(r'<div[^>]*>\s*</div>', '', html_content)
+
         # Create full HTML document
         full_html = self._create_full_html(html_content, metadata)
         

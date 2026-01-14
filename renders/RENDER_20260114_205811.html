@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lossless Capture Viewer</title>
+    <script>
+        // CRITICAL: Load theme BEFORE render to prevent FOUC
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <style>
+        /* 
+           🎨 REALITY-BASED CHATGPT STYLING 
+           Surgical match for chatgpt.com visual state.
+        */
+
+        :root {
+            /* Light Mode */
+            --bg-page: #ffffff;
+            --text-primary: #0d0d0d;
+            --text-secondary: #5d5d5d;
+            --code-bg: #f6f8fa;
+            --code-text: #0d0d0d;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --accent-color: #10a37f;
+
+            /* ChatGPT EXACT FONT STACK */
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        html[data-theme="dark"] {
+            /* Dark Mode */
+            --bg-page: #0d0d0d;
+            --text-primary: #ececec;
+            --text-secondary: #b4b4b4;
+            --code-bg: #0f172a;
+            --code-text: #e0e0e0;
+            --border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 48rem;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+            min-height: 100vh;
+        }
+
+        /* typography */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-weight: 600;
+            line-height: 1.3;
+            margin-top: 1.5em;
+            margin-bottom: 0.75em;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1.25em;
+        }
+
+        strong {
+            font-weight: 600;
+        }
+
+        ul,
+        ol {
+            margin-bottom: 1.25em;
+            padding-left: 1.5em;
+        }
+
+        li {
+            margin-bottom: 0.5em;
+        }
+
+        /* Code Blocks - Scoped & Faithful */
+        pre {
+            background-color: var(--code-bg) !important;
+            color: var(--code-text) !important;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 0.875em;
+            line-height: 1.6;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.875em;
+        }
+
+        /* Syntax Highlighting (ChatGPT Style) - Global because we strip the mono wrapper */
+        .mtk1 {
+            color: var(--text-primary);
+        }
+
+        /* Default */
+        .mtk3 {
+            color: #569cd6;
+        }
+
+        /* Keywords (Blue) */
+        .mtk5 {
+            color: #ce9178;
+        }
+
+        /* Strings (Orange/Brown) */
+        .mtk8 {
+            color: #6a9955;
+        }
+
+        /* Comments (Green) */
+        .mtk7 {
+            color: #d7ba7d;
+        }
+
+        /* Brackets (Yellow) */
+        .mtk11 {
+            color: #dcdcaa;
+        }
+
+        /* Functions (Light Yellow) */
+        .mtk6 {
+            color: #b5cea8;
+        }
+
+        /* Numbers (Light Green) */
+
+        /* Light Mode Highlighting Overrides */
+        html:not([data-theme="dark"]) .mtk3 {
+            color: #0000ff;
+        }
+
+        html:not([data-theme="dark"]) .mtk5 {
+            color: #a31515;
+        }
+
+        html:not([data-theme="dark"]) .mtk8 {
+            color: #008000;
+        }
+
+        /* Visibility & Performance */
+        .container>* {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: var(--font-sans);
+            font-size: 0.85em;
+            color: var(--text-primary);
+        }
+
+        .metadata {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">☀️ / 🌙</button>
+
+    <div class="container">
+        <!-- Content will be injected here -->
+        
+        <div class="metadata">
+            <strong>Source:</strong> Selection • 
+            <strong>Captured:</strong> 2026-01-14 20:58:11
+        </div>
+        <h1 data-start="5186" data-end="5214">🧠 FINAL TRUTH (IMPORTANT)</h1>
+<blockquote data-start="5216" data-end="5323">
+<p data-start="5218" data-end="5323">Your page is slow because you built it like an <strong data-start="5265" data-end="5272">app</strong><br data-start="5272" data-end="5275">
+But saved AI output must behave like a <strong data-start="5316" data-end="5323">PDF</strong></p>
+</blockquote>
+<p data-start="5325" data-end="5358">Static. Deterministic. Immediate.</p>
+<hr data-start="5360" data-end="5363">
+<p data-start="5365" data-end="5389">If you want, next I can:</p>
+<ul data-start="5390" data-end="5588">
+<li data-start="5390" data-end="5433">
+<p data-start="5392" data-end="5433">Diagnose <strong data-start="5401" data-end="5420">your exact HTML</strong> line-by-line</p>
+</li>
+<li data-start="5434" data-end="5483">
+<p data-start="5436" data-end="5483">Give you a <strong data-start="5447" data-end="5467">drop-in renderer</strong> that is instant</p>
+</li>
+<li data-start="5484" data-end="5540">
+<p data-start="5486" data-end="5540">Rewrite your capture pipeline to guarantee first paint</p>
+</li>
+<li data-start="5541" data-end="5588">
+<p data-start="5543" data-end="5588">Give you a <strong data-start="5554" data-end="5588">no-spinner invariant checklist</strong></p>
+</li>
+</ul>
+<p data-start="5590" data-end="5622" data-is-last-node="" data-is-only-node="">Just tell me what you want next.</p>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            if (current === 'dark') {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+    </script>
+</body>
+
+</html>

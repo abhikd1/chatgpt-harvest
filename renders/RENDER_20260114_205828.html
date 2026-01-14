@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lossless Capture Viewer</title>
+    <script>
+        // CRITICAL: Load theme BEFORE render to prevent FOUC
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <style>
+        /* 
+           🎨 REALITY-BASED CHATGPT STYLING 
+           Surgical match for chatgpt.com visual state.
+        */
+
+        :root {
+            /* Light Mode */
+            --bg-page: #ffffff;
+            --text-primary: #0d0d0d;
+            --text-secondary: #5d5d5d;
+            --code-bg: #f6f8fa;
+            --code-text: #0d0d0d;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --accent-color: #10a37f;
+
+            /* ChatGPT EXACT FONT STACK */
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        html[data-theme="dark"] {
+            /* Dark Mode */
+            --bg-page: #0d0d0d;
+            --text-primary: #ececec;
+            --text-secondary: #b4b4b4;
+            --code-bg: #0f172a;
+            --code-text: #e0e0e0;
+            --border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 48rem;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+            min-height: 100vh;
+        }
+
+        /* typography */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-weight: 600;
+            line-height: 1.3;
+            margin-top: 1.5em;
+            margin-bottom: 0.75em;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1.25em;
+        }
+
+        strong {
+            font-weight: 600;
+        }
+
+        ul,
+        ol {
+            margin-bottom: 1.25em;
+            padding-left: 1.5em;
+        }
+
+        li {
+            margin-bottom: 0.5em;
+        }
+
+        /* Code Blocks - Scoped & Faithful */
+        pre {
+            background-color: var(--code-bg) !important;
+            color: var(--code-text) !important;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 0.875em;
+            line-height: 1.6;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.875em;
+        }
+
+        /* Syntax Highlighting (ChatGPT Style) - Global because we strip the mono wrapper */
+        .mtk1 {
+            color: var(--text-primary);
+        }
+
+        /* Default */
+        .mtk3 {
+            color: #569cd6;
+        }
+
+        /* Keywords (Blue) */
+        .mtk5 {
+            color: #ce9178;
+        }
+
+        /* Strings (Orange/Brown) */
+        .mtk8 {
+            color: #6a9955;
+        }
+
+        /* Comments (Green) */
+        .mtk7 {
+            color: #d7ba7d;
+        }
+
+        /* Brackets (Yellow) */
+        .mtk11 {
+            color: #dcdcaa;
+        }
+
+        /* Functions (Light Yellow) */
+        .mtk6 {
+            color: #b5cea8;
+        }
+
+        /* Numbers (Light Green) */
+
+        /* Light Mode Highlighting Overrides */
+        html:not([data-theme="dark"]) .mtk3 {
+            color: #0000ff;
+        }
+
+        html:not([data-theme="dark"]) .mtk5 {
+            color: #a31515;
+        }
+
+        html:not([data-theme="dark"]) .mtk8 {
+            color: #008000;
+        }
+
+        /* Visibility & Performance */
+        .container>* {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: var(--font-sans);
+            font-size: 0.85em;
+            color: var(--text-primary);
+        }
+
+        .metadata {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">☀️ / 🌙</button>
+
+    <div class="container">
+        <!-- Content will be injected here -->
+        
+        <div class="metadata">
+            <strong>Source:</strong> Selection • 
+            <strong>Captured:</strong> 2026-01-14 20:58:28
+        </div>
+        <h1 data-start="4066" data-end="4107">🧠 THE GOLDEN FIX (THIS WILL SOLVE 90%)</h1>
+<h3 data-start="4109" data-end="4156">Do this once and your spinner problem dies:</h3>
+<h3 data-start="4158" data-end="4203">🔥 FINAL HTML TEMPLATE (FASTEST POSSIBLE)</h3>
+<pre class="overflow-visible! px-0!" data-start="4205" data-end="4849"><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1">html</div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre! language-html"><span><span><span class="hljs-meta">&lt;!doctype <span class="hljs-keyword">html</span></span></span><span>&gt;
+</span><span><span class="hljs-tag">&lt;<span class="hljs-name">html</span></span></span><span>&gt;
+</span><span><span class="hljs-tag">&lt;<span class="hljs-name">head</span></span></span><span>&gt;
+</span><span><span class="hljs-tag">&lt;<span class="hljs-name">meta</span></span></span><span> </span><span><span class="hljs-attr">charset</span></span><span>=</span><span><span class="hljs-string">"utf-8"</span></span><span>&gt;
+
+</span><span><span class="hljs-tag">&lt;<span class="hljs-name">style</span></span></span><span>&gt;<span class="language-css">
+</span></span><span><span class="hljs-comment">/* CRITICAL CSS */</span></span><span>
+</span><span><span class="hljs-selector-tag">html</span></span><span>, </span><span><span class="hljs-selector-tag">body</span></span><span> {
+  </span><span><span class="hljs-attribute">margin</span></span><span>: </span><span><span class="hljs-number">0</span></span><span>;
+  </span><span><span class="hljs-attribute">padding</span></span><span>: </span><span><span class="hljs-number">0</span></span><span>;
+  </span><span><span class="hljs-attribute">background</span></span><span>: </span><span><span class="hljs-number">#fff</span></span><span>;
+  </span><span><span class="hljs-attribute">color</span></span><span>: </span><span><span class="hljs-number">#0d0d0d</span></span><span>;
+  </span><span><span class="hljs-attribute">font-family</span></span><span>: system-ui, -apple-system, BlinkMacSystemFont, </span><span><span class="hljs-string">"Segoe UI"</span></span><span>, sans-serif;
+}
+
+</span><span><span class="hljs-selector-id">#content</span></span><span> {
+  </span><span><span class="hljs-attribute">padding</span></span><span>: </span><span><span class="hljs-number">16px</span></span><span>;
+  </span><span><span class="hljs-attribute">max-width</span></span><span>: </span><span><span class="hljs-number">48rem</span></span><span>;
+  </span><span><span class="hljs-attribute">margin</span></span><span>: auto;
+}
+
+pre {
+  </span><span><span class="hljs-attribute">background</span></span><span>: </span><span><span class="hljs-number">#f6f8fa</span></span><span>;
+  </span><span><span class="hljs-attribute">padding</span></span><span>: </span><span><span class="hljs-number">12px</span></span><span>;
+  </span><span><span class="hljs-attribute">border-radius</span></span><span>: </span><span><span class="hljs-number">8px</span></span><span>;
+  </span><span><span class="hljs-attribute">overflow</span></span><span>: auto;
+}
+</span><span><span class="hljs-tag">&lt;/<span class="hljs-name">style</span></span></span><span>&gt;
+
+</span><span><span class="hljs-tag">&lt;/<span class="hljs-name">head</span></span></span><span>&gt;
+</span><span><span class="hljs-tag">&lt;<span class="hljs-name">body</span></span></span><span>&gt;
+
+</span><span><span class="hljs-comment">&lt;!-- CONTENT IS ALREADY RENDERED --&gt;</span></span><span>
+</span><span><span class="hljs-tag">&lt;<span class="hljs-name">div</span></span></span><span> </span><span><span class="hljs-attr">id</span></span><span>=</span><span><span class="hljs-string">"content"</span></span><span>&gt;
+  </span><span><span class="hljs-comment">&lt;!-- PASTE FROZEN DOM HERE --&gt;</span></span><span>
+</span><span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span></span></span><span>&gt;
+
+</span><span><span class="hljs-comment">&lt;!-- OPTIONAL JS --&gt;</span></span><span>
+</span><span><span class="hljs-tag">&lt;<span class="hljs-name">script</span></span></span><span>&gt;<span class="language-javascript">
+</span></span><span><span class="hljs-comment">/* enhancements only — NOT required for reading */</span></span><span>
+</span><span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span></span></span><span>&gt;
+
+</span><span><span class="hljs-tag">&lt;/<span class="hljs-name">body</span></span></span><span>&gt;
+</span><span><span class="hljs-tag">&lt;/<span class="hljs-name">html</span></span></span><span>&gt;
+</span></span></code></div></div></pre>
+<p data-start="4851" data-end="4910">This <strong data-start="4856" data-end="4866">cannot</strong> show a spinner.<br>
+Browser paints immediately.</p>
+
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            if (current === 'dark') {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+    </script>
+</body>
+
+</html>

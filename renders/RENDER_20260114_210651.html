@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lossless Capture Viewer</title>
+    <script>
+        // CRITICAL: Load theme BEFORE render to prevent FOUC
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <style>
+        /* 
+           🎯 CHATGPT OFFICIAL UI SCHEMA 
+           1:1 Fidelity Implementation
+        */
+
+        :root {
+            /* Light Mode */
+            --bg-page: #ffffff;
+            --text-primary: #0d0d0d;
+            --text-secondary: #6b7280;
+            --code-bg: #f9fafb;
+            --code-text: #111827;
+            --border-color: #e5e7eb;
+            --accent-color: #10a37f;
+
+            /* EXACT FONT STACK */
+            --font-sans: "Söhne", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        html[data-theme="dark"] {
+            /* EXACT DARK MODE COLORS */
+            --bg-page: #0f0f10;
+            --text-primary: #e5e7eb;
+            --text-secondary: #9ca3af;
+            --code-bg: #111827;
+            --code-text: #e5e7eb;
+            --border-color: #374151;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 16px;
+            /* User Schema Requirement */
+            line-height: 1.75;
+            /* User Schema Requirement for spacing */
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 48rem;
+            margin: 0 auto;
+            padding: 4rem 1.5rem;
+            min-height: 100vh;
+        }
+
+        /* 🧱 HEADINGS - 600 weight, matched size */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.75;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1.25rem;
+        }
+
+        strong {
+            font-weight: 600;
+        }
+
+        ul,
+        ol {
+            margin-bottom: 1.25rem;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* 💻 CODE BLOCKS - Exact Spacing & Colors */
+        pre {
+            background-color: var(--code-bg) !important;
+            color: var(--code-text) !important;
+            padding: 12px 14px;
+            /* User Schema Requirement */
+            border-radius: 8px;
+            /* User Schema Requirement */
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 14px;
+            /* User Schema Requirement */
+            line-height: 1.6;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 14px;
+        }
+
+        /* Inline Code */
+        :not(pre)>code {
+            background-color: #1f2937;
+            /* Darker for dark mode */
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+
+        html:not([data-theme="dark"]) :not(pre)>code {
+            background-color: #f3f4f6;
+        }
+
+        /* 🖌 SYNTAX COLORS (MUTED GPT STYLE) */
+        .mtk3 {
+            color: #93c5fd;
+        }
+
+        /* Keywords */
+        .mtk5 {
+            color: #86efac;
+        }
+
+        /* Strings */
+        .mtk8 {
+            color: #6b7280;
+        }
+
+        /* Comments */
+        .mtk6 {
+            color: #fca5a5;
+        }
+
+        /* Numbers */
+        .mtk11 {
+            color: #c4b5fd;
+        }
+
+        /* Functions */
+
+        /* Light Mode Highlighting Overrides */
+        html:not([data-theme="dark"]) .mtk3 {
+            color: #2563eb;
+        }
+
+        html:not([data-theme="dark"]) .mtk5 {
+            color: #16a34a;
+        }
+
+        html:not([data-theme="dark"]) .mtk8 {
+            color: #6b7280;
+        }
+
+        /* 🧩 TABLES - Minimal & Flat */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 16px 0;
+        }
+
+        th,
+        td {
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        /* UI Controls */
+        .container>* {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: var(--font-sans);
+            font-size: 0.85em;
+            color: var(--text-primary);
+            z-index: 100;
+        }
+
+        .metadata {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">☀️ / 🌙</button>
+
+    <div class="container">
+        <!-- Content will be injected here -->
+        
+        <div class="metadata">
+            <strong>Source:</strong> Selection • 
+            <strong>Captured:</strong> 2026-01-14 21:06:51
+        </div>
+        <h3 data-start="2210" data-end="2247">✅ Automated screenshots (Level B)</h3>
+<ul data-start="2248" data-end="2321">
+<li data-start="2248" data-end="2291">
+<p data-start="2250" data-end="2291">Processing time (machine): ~2–3 minutes</p>
+</li>
+<li data-start="2292" data-end="2321">
+<p data-start="2294" data-end="2321">Human review: ~10 minutes</p>
+</li>
+</ul>
+<p data-start="2323" data-end="2351">⏱️ <strong data-start="2326" data-end="2351">Total: ~12–15 minutes</strong></p>
+<p data-start="2353" data-end="2375">🟢 <strong data-start="2356" data-end="2375">~85% time saved</strong></p>
+<hr data-start="2377" data-end="2380">
+<h3 data-start="2382" data-end="2416">✅ Content-aware + AI (Level C)</h3>
+<ul data-start="2417" data-end="2477">
+<li data-start="2417" data-end="2448">
+<p data-start="2419" data-end="2448">Processing time: ~5 minutes</p>
+</li>
+<li data-start="2449" data-end="2477">
+<p data-start="2451" data-end="2477">Human review: ~5 minutes</p>
+</li>
+</ul>
+<p data-start="2479" data-end="2504">⏱️ <strong data-start="2482" data-end="2504">Total: ~10 minutes</strong></p>
+<p data-start="2506" data-end="2528">🟢 <strong data-start="2509" data-end="2528">~90% time saved</strong></p>
+<hr data-start="2530" data-end="2533">
+<h2 data-start="2535" data-end="2573">3️⃣ Where does Rage App + Groq fit?</h2>
+<p data-start="2575" data-end="2606">This is the <strong data-start="2587" data-end="2605">important part</strong>.</p>
+<h3 data-start="2608" data-end="2641">⚡ Groq DOES NOT process video</h3>
+<p data-start="2642" data-end="2650">Groq is:</p>
+<ul data-start="2651" data-end="2705">
+<li data-start="2651" data-end="2681">
+<p data-start="2653" data-end="2681"><strong data-start="2653" data-end="2681">Ultra-fast LLM inference</strong></p>
+</li>
+<li data-start="2682" data-end="2705">
+<p data-start="2684" data-end="2705">Text-only (currently)</p>
+</li>
+</ul>
+<p data-start="2707" data-end="2753">So you <strong data-start="2714" data-end="2724">cannot</strong> give video directly to Groq.</p>
+<hr data-start="2755" data-end="2758">
+<h3 data-start="2760" data-end="2802">🧠 But Groq is PERFECT for this stage:</h3>
+<pre class="overflow-visible! px-0!" data-start="2803" data-end="2896"><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1">css</div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre!"><span><span>Frames / OCR </span><span><span class="hljs-selector-tag">text</span></span><span> / captions
+→ Decide which frames matter
+→ Summarize
+→ Index
+→ </span><span><span class="hljs-selector-tag">Label</span></span><span>
+</span></span></code></div></div></pre>
+<h3 data-start="2898" data-end="2930">Example Rage-style pipeline:</h3>
+<pre class="overflow-visible! px-0!" data-start="2931" data-end="3139"><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1">markdown</div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre!"><span><span>YouTube Video
+↓
+Auto screenshots (scene-based)
+↓
+OCR / captions extraction
+↓
+Groq LLM (decision engine):
+</span><span><span class="hljs-bullet">   -</span></span><span> Keep / discard
+</span><span><span class="hljs-bullet">   -</span></span><span> Tag (code, slide, formula)
+</span><span><span class="hljs-bullet">   -</span></span><span> Rank importance
+↓
+Final knowledge pack
+</span></span></code></div></div></pre>
+<h3 data-start="3141" data-end="3154">Why Groq?</h3>
+<ul data-start="3155" data-end="3252">
+<li data-start="3155" data-end="3195">
+<p data-start="3157" data-end="3195">5–10x faster than OpenAI for reasoning</p>
+</li>
+<li data-start="3196" data-end="3252">
+<p data-start="3198" data-end="3210">Perfect for:</p>
+<ul data-start="3213" data-end="3252">
+<li data-start="3213" data-end="3224">
+<p data-start="3215" data-end="3224">Filtering</p>
+</li>
+<li data-start="3227" data-end="3236">
+<p data-start="3229" data-end="3236">Ranking</p>
+</li>
+<li data-start="3239" data-end="3252">
+<p data-start="3241" data-end="3252">Structuring</p>
+</li>
+</ul>
+</li>
+</ul>
+<p data-start="3254" data-end="3277">⏱️ Groq time per video:</p>
+<ul data-start="3278" data-end="3315">
+<li data-start="3278" data-end="3315">
+<p data-start="3280" data-end="3315">1–3 seconds for full reasoning pass</p>
+</li>
+</ul>
+<p data-start="3317" data-end="3361">🟢 <strong data-start="3320" data-end="3361">Human thinking time almost eliminated</strong></p>
+
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            if (current === 'dark') {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+    </script>
+</body>
+
+</html>
