@@ -48,9 +48,9 @@ def append_to_master(new_html: str, source: str):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     # Wrap new content with a separator and metadata
     wrapped_content = f"""
-    <div class="harvest-entry" style="margin-top: 50px; border-top: 2px dashed #374151; padding-top: 20px;">
-        <div class="metadata" style="color: #9ca3af; font-size: 0.8em; margin-bottom: 10px;">
-            Captured on: {timestamp} | Source: {source}
+    <div class="harvest-entry" style="margin-top: 60px; border-top: 2px solid #374151; padding-top: 30px; margin-bottom: 20px;">
+        <div class="metadata" style="color: #9ca3af; font-family: sans-serif; font-size: 0.9em; margin-bottom: 15px; background: #1f2937; padding: 10px; border-radius: 6px; display: inline-block;">
+            <b>Captured:</b> {timestamp} | <b>Platform:</b> {source}
         </div>
         <div class="content">
             {new_html}
