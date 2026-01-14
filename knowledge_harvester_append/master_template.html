@@ -432,6 +432,27 @@
             outline: none;
             font-family: var(--font-sans);
         }
+
+        /* 🌓 ZEN FOCUS MODE */
+        .container.zen-mode .harvest-entry {
+            transition: opacity 0.4s, filter 0.4s, transform 0.4s;
+            opacity: 0.2;
+            filter: grayscale(1);
+        }
+
+        .container.zen-mode .harvest-entry:hover,
+        .container.zen-mode .harvest-entry.editing,
+        .container.zen-mode .harvest-entry:active {
+            opacity: 1;
+            filter: grayscale(0);
+            transform: scale(1.01);
+        }
+
+        .zen-toggle-btn.active {
+            background: #3b82f6;
+            color: #fff;
+            border-color: #2563eb;
+        }
     </style>
 </head>
 
@@ -470,6 +491,8 @@
             MD</button>
         <button class="control-btn master-btn delete-btn" onclick="deleteAll()" title="Clear Entire Log">🗑️ Master
             Delete</button>
+        <button class="control-btn master-btn zen-toggle-btn" id="zen-toggle" onclick="toggleZenMode()"
+            title="Toggle Zen Focus Mode">🌓 Focus</button>
         <button class="control-btn" style="border-radius:20px; font-size: 12px;" onclick="toggleTheme()">☀️/🌙</button>
     </div>
 
@@ -610,12 +633,27 @@
             // Load and apply display settings
             const savedGroup = localStorage.getItem('groupBy') || 'none';
             const savedSort = localStorage.getItem('sortOrder') || 'newest';
+            const zenEnabled = localStorage.getItem('zenMode') === 'true';
+
             document.getElementById('group-by').value = savedGroup;
             window.currentSortOrder = savedSort;
             updateSortIcon();
 
+            if (zenEnabled) {
+                document.querySelector('.container').classList.add('zen-mode');
+                document.getElementById('zen-toggle').classList.add('active');
+            }
+
             applyDisplaySettings();
         });
+
+        function toggleZenMode() {
+            const container = document.querySelector('.container');
+            const btn = document.getElementById('zen-toggle');
+            const isActive = container.classList.toggle('zen-mode');
+            btn.classList.toggle('active', isActive);
+            localStorage.setItem('zenMode', isActive);
+        }
 
         function toggleSortOrder() {
             window.currentSortOrder = window.currentSortOrder === 'newest' ? 'oldest' : 'newest';
