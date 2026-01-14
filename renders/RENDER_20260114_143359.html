@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Render Capture - 2026-01-14 14:33:59</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .metadata {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+            color: #666;
+            border-left: 4px solid #007bff;
+        }
+        
+        .metadata strong {
+            color: #333;
+        }
+        
+        .content {
+            font-size: 16px;
+            line-height: 1.8;
+        }
+        
+        .content h1 {
+            font-size: 2em;
+            margin: 1em 0 0.5em 0;
+            color: #1a1a1a;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 0.3em;
+        }
+        
+        .content h2 {
+            font-size: 1.5em;
+            margin: 1.2em 0 0.6em 0;
+            color: #2c3e50;
+        }
+        
+        .content h3 {
+            font-size: 1.2em;
+            margin: 1em 0 0.5em 0;
+            color: #34495e;
+        }
+        
+        .content p {
+            margin: 1em 0;
+        }
+        
+        .content ul, .content ol {
+            margin: 1em 0;
+            padding-left: 2em;
+        }
+        
+        .content li {
+            margin: 0.5em 0;
+        }
+        
+        .content code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+        
+        .content pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 1.5em 0;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .content pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+        }
+        
+        .content table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #dee2e6;
+            font-weight: 600;
+        }
+        
+        .content table td {
+            padding: 12px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .content table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .content blockquote {
+            border-left: 4px solid #007bff;
+            padding-left: 20px;
+            margin: 1.5em 0;
+            color: #555;
+            font-style: italic;
+        }
+        
+        .content strong {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .content em {
+            font-style: italic;
+            color: #555;
+        }
+        
+        .content hr {
+            border: none;
+            border-top: 2px solid #e0e0e0;
+            margin: 2em 0;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            text-align: center;
+            color: #999;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="metadata">
+            <strong>Source:</strong> https://chatgpt.com/c/6964d8e1-78ec-8330-b0b2-ff56f58d1d9d<br>
+            <strong>Captured:</strong> 2026-01-14 14:33:59<br>
+            <strong>Type:</strong> Render Capture (HTML Snapshot)
+        </div>
+        
+        <div class="content">
+
+        <style>
+            :root {
+                --spacing: 0.25rem;
+                --text-sm: 0.875rem;
+                --text-base: 1rem;
+                --bg-primary: #ffffff;
+                --text-primary: #0d0d0d;
+                --text-secondary: #5d5d5d;
+                --border-light: #0d0d0d0d;
+                --gray-100: #ececec;
+                --gray-950: #0d0d0d;
+                --default-mono-font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+            }
+
+            .content {
+                font-family: var(--default-font-family, ui-sans-serif, -apple-system, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif);
+                font-size: var(--text-base);
+                line-height: 1.75;
+                color: var(--text-primary);
+                background-color: var(--bg-primary);
+                padding: 1rem;
+            }
+
+            /* CHATGPT NATIVE CODE BLOCKS */
+            pre {
+                background-color: #f6f8fa !important; /* Authentic light-box look */
+                border: 1px solid var(--border-light);
+                border-radius: 0.375rem;
+                padding: 1rem;
+                margin: 1.5em 0;
+                overflow-x: auto;
+                font-family: var(--default-mono-font-family) !important;
+                font-size: 0.875em !important;
+                line-height: 1.71429;
+                color: #383a42;
+                white-space: pre !important; /* Native pre-formatting */
+            }
+
+            code {
+                font-family: inherit !important;
+            }
+
+            /* OFFICIAL HIGHLIGHT.JS COLORS from ChatGPT dump */
+            .hljs-built_in, .hljs-keyword { color: #c18401; }
+            .hljs-string { color: #50a14f; }
+            .hljs-comment { color: #a0a1a7; font-style: italic; }
+            .hljs-number { color: #986801; }
+            .hljs-title, .hljs-function { color: #4078f2; }
+
+            /* Table Styling */
+            table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+            th, td { border: 1px solid var(--gray-100); padding: 8px; }
+            th { background-color: var(--gray-100); text-align: left; font-weight: 600; }
+            
+            hr { border: 0; border-top: 1px solid var(--gray-100); margin: 3em 0; }
+        </style>
+    <div class="content"><h2 data-start="244" data-end="286">🟢 STEP 1: Start the server (ONLY ONCE)</h2>
+<ol data-start="288" data-end="379">
+<li data-start="288" data-end="327">
+<p data-start="291" data-end="327">Open <strong data-start="296" data-end="327">Command Prompt / PowerShell</strong></p>
+</li>
+<li data-start="328" data-end="358">
+<p data-start="331" data-end="358">Go to your project folder</p>
+</li>
+<li data-start="359" data-end="379">
+<p data-start="362" data-end="379">Run this command:</p>
+</li>
+</ol>
+<pre class="overflow-visible! px-0!" data-start="381" data-end="423"><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1">powershell</div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"><button class="flex gap-1 items-center select-none py-1" aria-label="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon-sm"><use href="/cdn/assets/sprites-core-jtokmzgv.svg#ce3544" fill="currentColor"></use></svg>Copy code</button></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre! language-powershell"><span><span>python capture_server.py
+</span></span></code></div></div></pre>
+<p data-start="425" data-end="462">✅ You should see something like this:</p>
+<pre class="overflow-visible! px-0!" data-start="464" data-end="568"><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1">arduino</div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"><button class="flex gap-1 items-center select-none py-1" aria-label="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon-sm"><use href="/cdn/assets/sprites-core-jtokmzgv.svg#ce3544" fill="currentColor"></use></svg>Copy code</button></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre!"><span><span>🔒 RENDER CAPTURE SERVER
+</span><span><span class="hljs-built_in">Server</span></span><span> running on http:</span><span><span class="hljs-comment">//localhost:8765</span></span><span>
+Waiting </span><span><span class="hljs-keyword">for</span></span><span> browser captures...
+</span></span></code></div></div></pre>
+<p data-start="570" data-end="601">👉 <strong data-start="573" data-end="601">DO NOT CLOSE THIS WINDOW</strong></p>
+<hr data-start="603" data-end="606">
+<h2 data-start="608" data-end="645">🟢 STEP 2: Open ChatGPT in browser</h2>
+<ol data-start="647" data-end="756">
+<li data-start="647" data-end="682">
+<p data-start="650" data-end="682">Open <strong data-start="655" data-end="682">Chrome / Edge / Firefox</strong></p>
+</li>
+<li data-start="683" data-end="711">
+<p data-start="686" data-end="711">Go to <strong data-start="692" data-end="711">chat.openai.com</strong></p>
+</li>
+<li data-start="712" data-end="756">
+<p data-start="715" data-end="756">Ask <strong data-start="719" data-end="742">any simple question</strong>, for example:</p>
+</li>
+</ol>
+<pre class="overflow-visible! px-0!" data-start="758" data-end="814"><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1">pgsql</div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"><button class="flex gap-1 items-center select-none py-1" aria-label="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon-sm"><use href="/cdn/assets/sprites-core-jtokmzgv.svg#ce3544" fill="currentColor"></use></svg>Copy code</button></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre!"><span><span><span class="hljs-keyword">Write</span></span><span> a Python </span><span><span class="hljs-keyword">function</span></span><span> </span><span><span class="hljs-keyword">with</span></span><span> comments </span><span><span class="hljs-keyword">and</span></span><span> emojis
+</span></span></code></div></div></pre>
+<ol start="4" data-start="816" data-end="842">
+<li data-start="816" data-end="842">
+<p data-start="819" data-end="842"><strong data-start="819" data-end="842">Wait for full reply</strong></p>
+</li>
+</ol>
+<hr data-start="844" data-end="847">
+<h2 data-start="849" data-end="896">🟢 STEP 3: Click the bookmarklet (ONE CLICK)</h2>
+<ol data-start="898" data-end="955">
+<li data-start="898" data-end="927">
+<p data-start="901" data-end="927">Look at your bookmarks bar</p>
+</li>
+<li data-start="928" data-end="955">
+<p data-start="931" data-end="955">Click <strong data-start="937" data-end="955">Capture Render</strong></p>
+</li>
+</ol>
+<p data-start="957" data-end="980">✅ You will see a popup:</p>
+<pre class="overflow-visible! px-0!" data-start="982" data-end="1001"><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1"></div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"><button class="flex gap-1 items-center select-none py-1" aria-label="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon-sm"><use href="/cdn/assets/sprites-core-jtokmzgv.svg#ce3544" fill="currentColor"></use></svg>Copy code</button></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre!"><span><span>✅ Captured!
+</span></span></code></div></div></pre>
+<p data-start="1003" data-end="1032">If you see this → <strong data-start="1021" data-end="1032">SUCCESS</strong></p>
+<hr data-start="1034" data-end="1037">
+<h2 data-start="1039" data-end="1084">🟢 STEP 4: Check the terminal (auto proof)</h2>
+<p data-start="1086" data-end="1134">Go back to the terminal where server is running.</p>
+<p data-start="1136" data-end="1151">You should see:</p>
+<pre class="overflow-visible! px-0!" data-start="1153" data-end="1237"><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1">css</div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"><button class="flex gap-1 items-center select-none py-1" aria-label="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon-sm"><use href="/cdn/assets/sprites-core-jtokmzgv.svg#ce3544" fill="currentColor"></use></svg>Copy code</button></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre!"><span><span>✅ Captured render </span><span><span class="hljs-selector-tag">from</span></span><span> ChatGPT
+Saved </span><span><span class="hljs-selector-tag">to</span></span><span>: renders\RENDER_YYYYMMDD_HHMMSS.html
+</span></span></code></div></div></pre>
+<p data-start="1239" data-end="1271">👉 This confirms capture worked.</p>
+<hr data-start="1273" data-end="1276">
+<h2 data-start="1278" data-end="1329">🟢 STEP 5: Open the captured file (FINAL RESULT)</h2>
+<p data-start="1331" data-end="1376">Run this in <strong data-start="1343" data-end="1363">another terminal</strong> or same one:</p>
+<pre class="overflow-visible! px-0!" data-start="1378" data-end="1409"><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1">powershell</div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"><button class="flex gap-1 items-center select-none py-1" aria-label="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon-sm"><use href="/cdn/assets/sprites-core-jtokmzgv.svg#ce3544" fill="currentColor"></use></svg>Copy code</button></div></div></div><div class="overflow-y-auto p-4 snipcss0-0-0-1 tether-element-attached-bottom tether-target-attached-top tether-element-attached-right tether-target-attached-right" dir="ltr"><code class="whitespace-pre! language-powershell snipcss0-1-1-2"><span class="snipcss0-2-2-3"><span class="snipcss0-3-3-4"><span class="hljs-built_in snipcss0-4-4-5">start</span></span><span class="snipcss0-3-3-6"> renders
+</span></span></code></div></div></pre>
+<ol data-start="1411" data-end="1466">
+<li data-start="1411" data-end="1443">
+<p data-start="1414" data-end="1443">Open the <strong data-start="1423" data-end="1443">latest HTML file</strong></p>
+</li>
+<li data-start="1444" data-end="1466">
+<p data-start="1447" data-end="1466">It opens in browser</p>
+</li>
+</ol>
+<p data-start="1468" data-end="1484">🎉 You will see:</p>
+<ul data-start="1485" data-end="1554">
+<li data-start="1485" data-end="1496">
+<p data-start="1487" data-end="1496">Bold text</p>
+</li>
+<li data-start="1497" data-end="1505">
+<p data-start="1499" data-end="1505">Emojis</p>
+</li>
+<li data-start="1506" data-end="1519">
+<p data-start="1508" data-end="1519">Code colors</p>
+</li>
+<li data-start="1520" data-end="1528">
+<p data-start="1522" data-end="1528">Tables</p>
+</li>
+<li data-start="1529" data-end="1554">
+<p data-start="1531" data-end="1554">Same spacing as ChatGPT</p>
+</li>
+</ul>
+<p data-start="1556" data-end="1596"><strong data-start="1556" data-end="1596">This is the final result you wanted.</strong></p>
+<hr data-start="1598" data-end="1601">
+<h1 data-start="1603" data-end="1627">🧪 QUICK TROUBLE CHECK</h1>
+<h3 data-start="1629" data-end="1666">❌ Popup says “Server not running”</h3>
+<p data-start="1667" data-end="1721">➡ You forgot Step 1<br data-start="1686" data-end="1689">
+➡ Run <code data-start="1695" data-end="1721">python capture_server.py</code></p></div>
+        </div>
+        
+        <div class="footer">
+            Captured by Lossless Harvest System - Render Mode
+        </div>
+    </div>
+</body>
+</html>

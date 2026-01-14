@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookmarklet Creator - Render Capture</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 800px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .step {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .step h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .step p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .bookmarklet-box {
+            background: #282c34;
+            color: #61dafb;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            word-break: break-all;
+            margin: 15px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+            text-decoration: none;
+            margin: 10px 10px 10px 0;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .drag-link {
+            display: inline-block;
+            background: #ffc107;
+            color: #000;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 15px 0;
+            cursor: move;
+            transition: all 0.3s;
+        }
+
+        .drag-link:hover {
+            background: #ffb300;
+            transform: scale(1.05);
+        }
+
+        .instructions {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .instructions strong {
+            color: #856404;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🎨 Render Capture Bookmarklet</h1>
+        <p class="subtitle">Create your one-click capture tool for ChatGPT/Gemini/Claude</p>
+
+        <div class="step">
+            <h2>Step 1: Show Bookmarks Bar</h2>
+            <p>Press <strong>Ctrl+Shift+B</strong> to show your browser's bookmarks bar</p>
+        </div>
+
+        <div class="step">
+            <h2>Step 2: Drag This Link to Bookmarks Bar</h2>
+            <p>Click and drag this button to your bookmarks bar:</p>
+            <a href="javascript:(function(){let html='';let source=window.location.hostname;let selection=window.getSelection();if(selection.rangeCount>0&&selection.toString().trim()){let range=selection.getRangeAt(0);let container=document.createElement('div');container.appendChild(range.cloneContents());html=container.innerHTML;source='Selected Content';}if(!html){let selectors=['article.w-full:last-of-type','.markdown.prose','[data-message-author-role=\"
+                assistant\"]:last-of-type','.agent-turn:last-of-type','.text-message:last-of-type'];for(let selector of
+                selectors){let elem=document.querySelector(selector);if(elem){html=elem.innerHTML;source='ChatGPT'
+                ;break;}}}if(!html){let
+                geminiSelectors=['.model-response-text:last-of-type','[data-test-id=\"model-response\"]:last-of-type','.response-container:last-of-type'];for(let
+                selector of geminiSelectors){let
+                elem=document.querySelector(selector);if(elem){html=elem.innerHTML;source='Gemini'
+                ;break;}}}if(!html){let
+                claudeSelectors=['[data-test-render-count]:last-of-type','.font-claude-message:last-of-type'];for(let
+                selector of claudeSelectors){let
+                elem=document.querySelector(selector);if(elem){html=elem.innerHTML;source='Claude'
+                ;break;}}}if(!html){let fallbacks=['article:last-of-type','main','.main-content'];for(let selector of
+                fallbacks){let
+                elem=document.querySelector(selector);if(elem){html=elem.innerHTML;break;}}}if(!html||html.trim().length<10){alert('❌
+                No content found!\\n\\nTry this:\\n1. SELECT the AI response (click and drag)\\n2. Click this
+                bookmarklet
+                again');return;}fetch('http://localhost:8765',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({html:html,source:source})}).then(response=>response.json()).then(data=>{if(data.status==='success'){alert('✅
+                Render captured!\\n\\n'+data.message+'\\n\\nSize: '+Math.round(html.length/1024)+' KB');}else{alert('❌
+                Capture failed:\\n\\n'+data.message);}}).catch(error=>{alert('❌ Server not running!\\n\\nStart
+                server:\\npython capture_server.py');});})();" class="drag-link">
+                📸 Capture Render
+            </a>
+            <p style="margin-top: 15px;"><em>Or copy the code below and create bookmark manually:</em></p>
+            <button class="btn" onclick="copyCode()">📋 Copy Code</button>
+            <div class="bookmarklet-box" id="code">javascript:(function(){let html='';let
+                source=window.location.hostname;let
+                selection=window.getSelection();if(selection.rangeCount>0&&selection.toString().trim()){let
+                range=selection.getRangeAt(0);let
+                container=document.createElement('div');container.appendChild(range.cloneContents());html=container.innerHTML;source='Selected
+                Content';}if(!html){let
+                selectors=['article.w-full:last-of-type','.markdown.prose','[data-message-author-role="assistant"]:last-of-type','.agent-turn:last-of-type','.text-message:last-of-type'];for(let
+                selector of selectors){let
+                elem=document.querySelector(selector);if(elem){html=elem.innerHTML;source='ChatGPT';break;}}}if(!html){let
+                geminiSelectors=['.model-response-text:last-of-type','[data-test-id="model-response"]:last-of-type','.response-container:last-of-type'];for(let
+                selector of geminiSelectors){let
+                elem=document.querySelector(selector);if(elem){html=elem.innerHTML;source='Gemini';break;}}}if(!html){let
+                claudeSelectors=['[data-test-render-count]:last-of-type','.font-claude-message:last-of-type'];for(let
+                selector of claudeSelectors){let
+                elem=document.querySelector(selector);if(elem){html=elem.innerHTML;source='Claude';break;}}}if(!html){let
+                fallbacks=['article:last-of-type','main','.main-content'];for(let selector of fallbacks){let
+                elem=document.querySelector(selector);if(elem){html=elem.innerHTML;break;}}}if(!html||html.trim().length
+                <10){alert('❌ No content found!\\n\\nTry this:\\n1. SELECT the AI response (click and drag)\\n2. Click
+                    this bookmarklet
+                    again');return;}fetch('http://localhost:8765',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({html:html,source:source})}).then(response=>
+                    response.json()).then(data=>{if(data.status==='success'){alert('✅ Render
+                    captured!\\n\\n'+data.message+'\\n\\nSize: '+Math.round(html.length/1024)+' KB');}else{alert('❌
+                    Capture failed:\\n\\n'+data.message);}}).catch(error=>{alert('❌ Server not running!\\n\\nStart
+                    server:\\npython capture_server.py');});})();</div>
+            <div class="alert alert-success" id="copyAlert">✅ Code copied! Now create a bookmark and paste this as the
+                URL.</div>
+        </div>
+
+        <div class="step">
+            <h2>Step 3: Start the Server</h2>
+            <p>Before using the bookmarklet, start the capture server:</p>
+            <div class="bookmarklet-box" style="color: #98c379;">python capture_server.py</div>
+            <p>Or double-click: <strong>START_RENDER_SERVER.bat</strong></p>
+        </div>
+
+        <div class="step">
+            <h2>Step 4: Use It!</h2>
+            <p>1. Go to ChatGPT/Gemini/Claude</p>
+            <p>2. Get an AI response</p>
+            <p>3. Click the "Capture Render" bookmark</p>
+            <p>4. See popup: "✅ Captured!"</p>
+            <p>5. Open: <code>renders/RENDER_*.html</code></p>
+        </div>
+
+        <div class="instructions">
+            <strong>💡 Pro Tip:</strong> The bookmarklet automatically detects ChatGPT, Gemini, and Claude responses.
+            Just click it after the AI responds!
+        </div>
+    </div>
+
+    <script>
+        function copyCode() {
+            const code = document.getElementById('code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const alert = document.getElementById('copyAlert');
+                alert.style.display = 'block';
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 3000);
+            });
+        }
+    </script>
+</body>
+
+</html>

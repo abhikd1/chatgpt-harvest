@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Render Capture - 2026-01-14 14:49:24</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .metadata {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+            color: #666;
+            border-left: 4px solid #007bff;
+        }
+        
+        .metadata strong {
+            color: #333;
+        }
+        
+        .content {
+            font-size: 16px;
+            line-height: 1.8;
+        }
+        
+        .content h1 {
+            font-size: 2em;
+            margin: 1em 0 0.5em 0;
+            color: #1a1a1a;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 0.3em;
+        }
+        
+        .content h2 {
+            font-size: 1.5em;
+            margin: 1.2em 0 0.6em 0;
+            color: #2c3e50;
+        }
+        
+        .content h3 {
+            font-size: 1.2em;
+            margin: 1em 0 0.5em 0;
+            color: #34495e;
+        }
+        
+        .content p {
+            margin: 1em 0;
+        }
+        
+        .content ul, .content ol {
+            margin: 1em 0;
+            padding-left: 2em;
+        }
+        
+        .content li {
+            margin: 0.5em 0;
+        }
+        
+        .content code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+        
+        .content pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 1.5em 0;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .content pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+        }
+        
+        .content table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #dee2e6;
+            font-weight: 600;
+        }
+        
+        .content table td {
+            padding: 12px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .content table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .content blockquote {
+            border-left: 4px solid #007bff;
+            padding-left: 20px;
+            margin: 1.5em 0;
+            color: #555;
+            font-style: italic;
+        }
+        
+        .content strong {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .content em {
+            font-style: italic;
+            color: #555;
+        }
+        
+        .content hr {
+            border: none;
+            border-top: 2px solid #e0e0e0;
+            margin: 2em 0;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            text-align: center;
+            color: #999;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="metadata">
+            <strong>Source:</strong> https://chatgpt.com/c/6964d8e1-78ec-8330-b0b2-ff56f58d1d9d<br>
+            <strong>Captured:</strong> 2026-01-14 14:49:24<br>
+            <strong>Type:</strong> Render Capture (HTML Snapshot)
+        </div>
+        
+        <div class="content">
+
+        <style>
+            :root { 
+                --spacing: .25rem; 
+                --text-sm: .875rem; 
+                --text-sm--line-height: calc(1.25/.875); 
+                --text-base: 1rem; 
+                --text-base--line-height: calc(1.5/1); 
+                --radius-2xl: 1rem; 
+                --default-font-family: "ui-sans-serif","-apple-system","system-ui","Segoe UI","Helvetica","Apple Color Emoji","Arial","sans-serif","Segoe UI Emoji","Segoe UI Symbol"; 
+                --default-mono-font-family: "ui-monospace","SFMono-Regular","SF Mono","Menlo","Consolas","Liberation Mono","monospace"; 
+                --mkt-header-height: calc(16*var(--spacing));
+                --default-theme-user-msg-bg: #e9e9e980; 
+                --default-theme-user-msg-text: #0d0d0d; 
+                --default-theme-submit-btn-bg: #000; 
+                --default-theme-submit-btn-text: #fff; 
+                --default-theme-secondary-btn-bg: #ececec; 
+                --default-theme-secondary-btn-text: #0d0d0d; 
+                --default-theme-user-selection-bg: #339cff59; 
+                --default-theme-attribution-highlight-bg: #ffeeb8; 
+                --default-theme-entity-accent: #0169cc; 
+                --sidebar-rail-width: calc(13*var(--spacing)); 
+                --header-height: calc(13*var(--spacing));
+                --white: #fff; 
+                --black: #000; 
+                --gray-50: #f9f9f9; 
+                --gray-100: #ececec; 
+                --gray-200: #e3e3e3; 
+                --gray-800: #212121; 
+                --gray-950: #0d0d0d; 
+                --red-500: #e02e2a; 
+            }
+
+            body.captured-content {  
+                background-color: var(--bg-primary, #fff);
+                color: var(--text-primary, #0d0d0d);
+                font-family: var(--default-font-family);
+                font-size: .875em;
+                line-height: 1.71429;
+                /* CSS Variables provided by user */
+                --tw-contain-size:  inline-size;  
+                --message-surface:  #e9e9e980;  
+                --composer-surface:  var(--message-surface);  
+                --composer-surface-primary:  var(--main-surface-primary);  
+                --dot-color:  var(--black);  
+                --text-primary:  var(--gray-950);  
+                --text-primary-inverse:  var(--gray-100);  
+                --text-secondary:  #0009;  
+                --text-danger:  var(--red-500);  
+                --border-light:  #0000001a;  
+                --border-xheavy:  #00000040;  
+                --border-sharp:  #0000000d;  
+                --main-surface-primary:  var(--white);  
+                --main-surface-primary-inverse:  var(--gray-800);  
+                --main-surface-secondary:  var(--gray-50);  
+                --main-surface-tertiary:  var(--gray-100);  
+                --sidebar-surface-primary:  var(--gray-50);  
+                --sidebar-surface-secondary:  var(--gray-100);  
+                --sidebar-surface-tertiary:  var(--gray-200);  
+                --scrollbar-color:  #0000001a;  
+                --scrollbar-color-hover:  #0003; 
+                --tw-prose-body:  var(--text-primary);  
+                --tw-prose-headings:  var(--text-primary);  
+                --tw-prose-lead:  var(--text-primary);  
+                --tw-prose-links:  var(--text-primary);  
+                --tw-prose-bold:  var(--text-primary);  
+                --tw-prose-counters:  var(--text-primary);  
+                --tw-prose-bullets:  var(--text-primary);  
+                --tw-prose-hr:  var(--border-xheavy);  
+                --tw-prose-quotes:  var(--text-primary);  
+                --tw-prose-captions:  var(--text-secondary);  
+                --tw-prose-code:  var(--text-primary);  
+                --bg-primary:  #fff;  
+                --border-light:  #0d0d0d0d;  
+                --text-primary:  #0d0d0d;  
+                --text-secondary:  #5d5d5d;  
+                --thread-content-max-width:  48rem; 
+                --thread-content-margin:  calc(var(--spacing)*16); 
+            }
+
+            .content {
+                max-width: var(--thread-content-max-width);
+                margin: 0 auto;
+                padding: var(--thread-content-margin);
+            }
+
+            pre { 
+                font-family: var(--default-mono-font-family,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace); 
+                font-size: .875em; 
+                font-weight: 400; 
+                line-height: 1.71429; 
+                overflow-x: auto;
+                background-color: #f7f7f8 !important;
+                border-radius: .375rem;
+                padding: 1rem !important;
+                margin: 1rem 0;
+                color: #383a42;
+            } 
+
+            code { 
+                font-family: var(--default-mono-font-family)!important; 
+                font-size: 1em;
+            } 
+
+            .prose :where(code):not(:where([class ~ ="not-prose"] *)) { 
+                color: var(--tw-prose-code); 
+                background-color: var(--gray-100); 
+                border-radius: .25rem; 
+                padding: .15rem .3rem; 
+                font-size: .875em; 
+                font-weight: 500;
+            }
+
+            .hljs-built_in { color: #c18401; } 
+            .hljs-keyword { color: #a626a4; }
+            .hljs-string { color: #50a14f; }
+            .hljs-comment { color: #a0a1a7; font-style: italic; }
+            
+            table { border-collapse: collapse; width: 100%; margin: 1em 0; border: 1px solid var(--gray-200); }
+            th, td { border: 1px solid var(--gray-200); padding: 8px; }
+            th { background-color: var(--gray-50); text-align: left; }
+        </style>
+    <div class="captured-content"><div class="content"><div class="relative basis-auto flex-col -mb-(--composer-overlap-px) [--composer-overlap-px:28px] grow flex"><div class="flex flex-col text-sm pb-25" style=""><article class="text-token-text-primary w-full focus:outline-none [--shadow-height:45px] has-data-writing-block:pointer-events-none has-data-writing-block:-mt-(--shadow-height) has-data-writing-block:pt-(--shadow-height) [&amp;:has([data-writing-block])&gt;*]:pointer-events-auto scroll-mt-(--header-height)" tabindex="-1" dir="auto" data-turn-id="5dc4af23-2ec3-44be-b761-3716bd668dbc" data-testid="conversation-turn-269" data-scroll-anchor="false" data-turn="user" style="scroll-margin-top: -18496px;"><div class="text-base my-auto mx-auto pt-12 [--thread-content-margin:--spacing(4)] @w-sm/main:[--thread-content-margin:--spacing(6)] @w-lg/main:[--thread-content-margin:--spacing(16)] px-(--thread-content-margin)"><div class="[--thread-content-max-width:40rem] @w-lg/main:[--thread-content-max-width:48rem] mx-auto max-w-(--thread-content-max-width) flex-1 group/turn-messages focus-visible:outline-hidden relative flex w-full min-w-0 flex-col" tabindex="-1"><div class="flex max-w-full flex-col grow"><div data-message-author-role="user" data-message-id="5dc4af23-2ec3-44be-b761-3716bd668dbc" dir="auto" class="min-h-8 text-message relative flex w-full flex-col items-end gap-2 text-start break-words whitespace-normal [.text-message+&amp;]:mt-1"><div class="flex w-full flex-col gap-1 empty:hidden items-end rtl:items-start"><div class="user-message-bubble-color corner-superellipse/1.1 relative rounded-[18px] px-4 py-1.5 data-[multiline]:py-3 max-w-[var(--user-chat-width,70%)]" data-multiline=""><div class="whitespace-pre-wrap">ght .hljs-built_in  { 
+    color: #c18401;
+}   you know what uit is looking as the chat gpt but it no t tlel me what should i need tio giove the css style idea to auia code aditor so that it can make the looiking alsoike you reoply7 and also make siure to tell me that it is genmini flash and ftehe  gemini 3 por nad  tell  me other option if you know   so giv eme idea i want to make tyhe code lik\ that 
+
+</div></div></div></div></div><div class="z-0 flex justify-end"><div class="touch:-me-2 touch:-ms-3.5 -ms-2.5 -me-1 flex flex-wrap items-center gap-y-4 p-1 select-none focus-within:transition-none hover:transition-none touch:pointer-events-auto touch:opacity-100 duration-300 group-hover/turn-messages:delay-300 pointer-events-none opacity-0 motion-safe:transition-opacity group-hover/turn-messages:pointer-events-auto group-hover/turn-messages:opacity-100 group-focus-within/turn-messages:pointer-events-auto group-focus-within/turn-messages:opacity-100 has-data-[state=open]:pointer-events-auto has-data-[state=open]:opacity-100" style="mask-position: 0% 0%;"><button class="text-token-text-secondary hover:bg-token-bg-secondary rounded-lg" aria-label="Copy" aria-pressed="false" data-testid="copy-turn-action-button" data-state="closed"><span class="flex items-center justify-center touch:w-10 h-8 w-8"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon"><use href="/cdn/assets/sprites-core-jtokmzgv.svg#ce3544" fill="currentColor"></use></svg></span></button><button class="text-token-text-secondary hover:bg-token-bg-secondary rounded-lg" aria-label="Edit message" aria-pressed="false" data-state="closed"><span class="flex items-center justify-center touch:w-10 h-8 w-8"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon"><use href="/cdn/assets/sprites-core-jtokmzgv.svg#6d87e1" fill="currentColor"></use></svg></span></button></div></div></div></div></article><article class="text-token-text-primary w-full focus:outline-none [--shadow-height:45px] has-data-writing-block:pointer-events-none has-data-writing-block:-mt-(--shadow-height) has-data-writing-block:pt-(--shadow-height) [&amp;:has([data-writing-block])&gt;*]:pointer-events-auto scroll-mt-[calc(var(--header-height)+min(200px,max(70px,20svh)))]" tabindex="-1" dir="auto" data-turn-id="request-6964d8e1-78ec-8330-b0b2-ff56f58d1d9d-1" data-testid="conversation-turn-270" data-scroll-anchor="true" data-turn="assistant" style="min-height: calc(-248px + 100dvh);"><h6 class="sr-only">ChatGPT said:</h6><div class="text-base my-auto mx-auto pb-10 [--thread-content-margin:--spacing(4)] @w-sm/main:[--thread-content-margin:--spacing(6)] @w-lg/main:[--thread-content-margin:--spacing(16)] px-(--thread-content-margin)"><div class="[--thread-content-max-width:40rem] @w-lg/main:[--thread-content-max-width:48rem] mx-auto max-w-(--thread-content-max-width) flex-1 group/turn-messages focus-visible:outline-hidden relative flex w-full min-w-0 flex-col agent-turn" tabindex="-1"><div class="flex max-w-full flex-col grow"><div data-message-author-role="assistant" data-message-id="a2e5aba2-323b-4440-a912-19e597140c13" dir="auto" class="min-h-8 text-message relative flex w-full flex-col items-end gap-2 text-start break-words whitespace-normal [.text-message+&amp;]:mt-1" data-message-model-slug="gpt-5-2"><div class="flex w-full flex-col gap-1 empty:hidden first:pt-[1px]"><div class="markdown prose dark:prose-invert w-full break-words light markdown-new-styling"><p data-start="0" data-end="139">Good — now I <strong data-start="13" data-end="33">fully understand</strong> what you want, and you are <strong data-start="61" data-end="74">not wrong</strong>.<br data-start="75" data-end="78">
+You are trying to do something <strong data-start="109" data-end="138">most people misunderstand</strong>:</p>
+<blockquote data-start="141" data-end="196">
+<p data-start="143" data-end="196">❌ “Copy text”<br>
+✅ “Clone the <em data-start="172" data-end="195">rendered AI interface</em>”</p>
+</blockquote>
+<p data-start="198" data-end="290">I’ll explain this <strong data-start="216" data-end="227">clearly</strong>, then give you <strong data-start="243" data-end="271">exact, practical options</strong> you can implement.</p>
+<hr data-start="292" data-end="295">
+<h2 data-start="297" data-end="335">1️⃣ First, a HARD TRUTH (important)</h2>
+<h3 data-start="337" data-end="403">⚠️ You CANNOT perfectly “copy ChatGPT UI” using only saved CSS</h3>
+<p data-start="405" data-end="409">Why?</p>
+<p data-start="411" data-end="452">Because ChatGPT (and Gemini, Claude) use:</p>
+<ul data-start="454" data-end="597">
+<li data-start="454" data-end="473">
+<p data-start="456" data-end="473"><strong data-start="456" data-end="473">React runtime</strong></p>
+</li>
+<li data-start="474" data-end="504">
+<p data-start="476" data-end="504"><strong data-start="476" data-end="504">Dynamic Tailwind classes</strong></p>
+</li>
+<li data-start="505" data-end="538">
+<p data-start="507" data-end="538"><strong data-start="507" data-end="538">JS-based layout + hydration</strong></p>
+</li>
+<li data-start="539" data-end="567">
+<p data-start="541" data-end="567"><strong data-start="541" data-end="567">Internal design tokens</strong></p>
+</li>
+<li data-start="568" data-end="597">
+<p data-start="570" data-end="597"><strong data-start="570" data-end="597">Private component trees</strong></p>
+</li>
+</ul>
+<p data-start="599" data-end="662">What you pasted is <strong data-start="618" data-end="634">computed CSS</strong>, not the <strong data-start="644" data-end="661">source system</strong>.</p>
+<p data-start="664" data-end="675">That means:</p>
+<ul data-start="676" data-end="805">
+<li data-start="676" data-end="700">
+<p data-start="678" data-end="700">✔️ It can LOOK similar</p>
+</li>
+<li data-start="701" data-end="735">
+<p data-start="703" data-end="735">❌ It can NEVER be 100% identical</p>
+</li>
+<li data-start="736" data-end="805">
+<p data-start="738" data-end="805">❌ You cannot “rebuild ChatGPT” just by pasting CSS into another app</p>
+</li>
+</ul>
+<p data-start="807" data-end="835">👉 This is not your mistake.</p>
+<hr data-start="837" data-end="840">
+<h2 data-start="842" data-end="900">2️⃣ What EXACTLY is going wrong in your current result?</h2>
+<p data-start="902" data-end="929">You said this key sentence:</p>
+<blockquote data-start="931" data-end="972">
+<p data-start="933" data-end="972">“It looks like ChatGPT but not exactly”</p>
+</blockquote>
+<h3 data-start="974" data-end="990">The reasons:</h3>
+<ol data-start="992" data-end="1403">
+<li data-start="992" data-end="1074">
+<p data-start="995" data-end="1013"><strong data-start="995" data-end="1013">Fonts mismatch</strong></p>
+<ul data-start="1017" data-end="1074">
+<li data-start="1017" data-end="1074">
+<p data-start="1019" data-end="1074">ChatGPT uses platform font fallback + Apple Color Emoji</p>
+</li>
+</ul>
+</li>
+<li data-start="1075" data-end="1146">
+<p data-start="1078" data-end="1103"><strong data-start="1078" data-end="1103">Spacing tokens differ</strong></p>
+<ul data-start="1107" data-end="1146">
+<li data-start="1107" data-end="1146">
+<p data-start="1109" data-end="1146"><code data-start="1109" data-end="1120">--spacing</code> is contextual, not static</p>
+</li>
+</ul>
+</li>
+<li data-start="1147" data-end="1236">
+<p data-start="1150" data-end="1179"><strong data-start="1150" data-end="1179">Markdown renderer missing</strong></p>
+<ul data-start="1183" data-end="1236">
+<li data-start="1183" data-end="1236">
+<p data-start="1185" data-end="1236">ChatGPT uses <strong data-start="1198" data-end="1236">custom Markdown + React components</strong></p>
+</li>
+</ul>
+</li>
+<li data-start="1237" data-end="1319">
+<p data-start="1240" data-end="1276"><strong data-start="1240" data-end="1276">Code highlighting engine missing</strong></p>
+<ul data-start="1280" data-end="1319">
+<li data-start="1280" data-end="1319">
+<p data-start="1282" data-end="1319">Prism / Shiki styles not fully loaded</p>
+</li>
+</ul>
+</li>
+<li data-start="1320" data-end="1403">
+<p data-start="1323" data-end="1352"><strong data-start="1323" data-end="1352">Container context missing</strong></p>
+<ul data-start="1356" data-end="1403">
+<li data-start="1356" data-end="1403">
+<p data-start="1358" data-end="1403">Many styles depend on parent layout, not body</p>
+</li>
+</ul>
+</li>
+</ol>
+<p data-start="1405" data-end="1428">So your output becomes:</p>
+<ul data-start="1429" data-end="1486">
+<li data-start="1429" data-end="1456">
+<p data-start="1431" data-end="1456">❌ “Plain but styled text”</p>
+</li>
+<li data-start="1457" data-end="1486">
+<p data-start="1459" data-end="1486">Not ❌ “ChatGPT response UI”</p>
+</li>
+</ul>
+<hr data-start="1488" data-end="1491">
+<h2 data-start="1493" data-end="1541">3️⃣ The CORRECT mental model (very important)</h2>
+<h3 data-start="1543" data-end="1561">Stop thinking:</h3>
+<blockquote data-start="1562" data-end="1592">
+<p data-start="1564" data-end="1592">“How do I copy ChatGPT CSS?”</p>
+</blockquote>
+<h3 data-start="1594" data-end="1613">Start thinking:</h3>
+<blockquote data-start="1614" data-end="1670">
+<p data-start="1616" data-end="1670">“How do I REPRODUCE the ChatGPT <em data-start="1648" data-end="1668">READING EXPERIENCE</em>?”</p>
+</blockquote>
+<p data-start="1672" data-end="1699">This is the <strong data-start="1684" data-end="1698">right goal</strong>.</p>
+<hr data-start="1701" data-end="1704">
+<h2 data-start="1706" data-end="1749">4️⃣ The ONLY 3 REAL OPTIONS (choose one)</h2>
+<h3 data-start="1751" data-end="1786">🥇 OPTION 1 (BEST, RECOMMENDED)</h3>
+<h3 data-start="1787" data-end="1838">🔥 <strong data-start="1794" data-end="1838">HTML SNAPSHOT (what you already started)</strong></h3>
+<p data-start="1840" data-end="1872">This is the <strong data-start="1852" data-end="1864">only way</strong> to get:</p>
+<ul data-start="1874" data-end="1941">
+<li data-start="1874" data-end="1880">
+<p data-start="1876" data-end="1880">Bold</p>
+</li>
+<li data-start="1881" data-end="1889">
+<p data-start="1883" data-end="1889">Emojis</p>
+</li>
+<li data-start="1890" data-end="1898">
+<p data-start="1892" data-end="1898">Tables</p>
+</li>
+<li data-start="1899" data-end="1912">
+<p data-start="1901" data-end="1912">Code colors</p>
+</li>
+<li data-start="1913" data-end="1922">
+<p data-start="1915" data-end="1922">Spacing</p>
+</li>
+<li data-start="1923" data-end="1941">
+<p data-start="1925" data-end="1941">Visual hierarchy</p>
+</li>
+</ul>
+<p data-start="1943" data-end="2054">✅ You already have this with your bookmarklet<br data-start="1988" data-end="1991">
+✅ This is how tools like <strong data-start="2016" data-end="2049">Readwise, Arc, Notion Clipper</strong> work</p>
+<p data-start="2056" data-end="2081"><strong data-start="2056" data-end="2081">Improve it like this:</strong></p>
+<h4 data-start="2083" data-end="2119">Do NOT inject all ChatGPT CSS</h4>
+<p data-start="2120" data-end="2128">Instead:</p>
+<ol data-start="2130" data-end="2257">
+<li data-start="2130" data-end="2184">
+<p data-start="2133" data-end="2141">Capture:</p>
+<ul data-start="2145" data-end="2184">
+<li data-start="2145" data-end="2184">
+<p data-start="2147" data-end="2184"><code data-start="2147" data-end="2158">innerHTML</code> of the response container</p>
+</li>
+</ul>
+</li>
+<li data-start="2185" data-end="2225">
+<p data-start="2188" data-end="2225">Wrap it in a <strong data-start="2201" data-end="2225">minimal viewer shell</strong></p>
+</li>
+<li data-start="2226" data-end="2257">
+<p data-start="2229" data-end="2257">Use <strong data-start="2233" data-end="2257">neutral prose styles</strong></p>
+</li>
+</ol>
+<p data-start="2259" data-end="2297">This is what ChatGPT itself relies on:</p>
+<pre class="overflow-visible! px-0!" data-start="2299" data-end="2600"><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1">css</div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"><button class="flex gap-1 items-center select-none py-1" aria-label="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon-sm"><use href="/cdn/assets/sprites-core-jtokmzgv.svg#ce3544" fill="currentColor"></use></svg>Copy code</button></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre! language-css"><span><span><span class="hljs-selector-class">.prose</span></span><span> {
+  </span><span><span class="hljs-attribute">max-width</span></span><span>: </span><span><span class="hljs-number">48rem</span></span><span>;
+  </span><span><span class="hljs-attribute">font-family</span></span><span>: system-ui, -apple-system, Segoe UI, Roboto;
+  </span><span><span class="hljs-attribute">line-height</span></span><span>: </span><span><span class="hljs-number">1.75</span></span><span>;
+}
+
+</span><span><span class="hljs-selector-class">.prose</span></span><span> pre {
+  </span><span><span class="hljs-attribute">background</span></span><span>: </span><span><span class="hljs-number">#f6f8fa</span></span><span>;
+  </span><span><span class="hljs-attribute">padding</span></span><span>: </span><span><span class="hljs-number">12px</span></span><span>;
+  </span><span><span class="hljs-attribute">border-radius</span></span><span>: </span><span><span class="hljs-number">8px</span></span><span>;
+  </span><span><span class="hljs-attribute">overflow-x</span></span><span>: auto;
+}
+
+</span><span><span class="hljs-selector-class">.prose</span></span><span> </span><span><span class="hljs-selector-tag">code</span></span><span> {
+  </span><span><span class="hljs-attribute">background</span></span><span>: </span><span><span class="hljs-number">#ececec</span></span><span>;
+  </span><span><span class="hljs-attribute">padding</span></span><span>: </span><span><span class="hljs-number">2px</span></span><span> </span><span><span class="hljs-number">6px</span></span><span>;
+  </span><span><span class="hljs-attribute">border-radius</span></span><span>: </span><span><span class="hljs-number">4px</span></span><span>;
+}
+</span></span></code></div></div></pre>
+<p data-start="2602" data-end="2711">✅ This copies <strong data-start="2616" data-end="2627">meaning</strong>, not fragile internals<br data-start="2650" data-end="2653">
+✅ This is future-proof<br data-start="2675" data-end="2678">
+✅ This is how professionals do it</p>
+<hr data-start="2713" data-end="2716">
+<h3 data-start="2718" data-end="2756">🥈 OPTION 2 (PARTIAL, EDITOR MODE)</h3>
+<h3 data-start="2757" data-end="2803">🧠 <strong data-start="2764" data-end="2803">Render to Markdown + Preview Engine</strong></h3>
+<p data-start="2805" data-end="2860">If you want it <strong data-start="2820" data-end="2840">inside an editor</strong> (VS Code / Monaco):</p>
+<p data-start="2862" data-end="2866">Use:</p>
+<ul data-start="2868" data-end="2925">
+<li data-start="2868" data-end="2882">
+<p data-start="2870" data-end="2882"><strong data-start="2870" data-end="2882">Markdown</strong></p>
+</li>
+<li data-start="2883" data-end="2905">
+<p data-start="2885" data-end="2905"><strong data-start="2885" data-end="2905">Markdown Preview</strong></p>
+</li>
+<li data-start="2906" data-end="2925">
+<p data-start="2908" data-end="2925"><strong data-start="2908" data-end="2925">Shiki / Prism</strong></p>
+</li>
+</ul>
+<p data-start="2927" data-end="2941">Example stack:</p>
+<ul data-start="2942" data-end="2995">
+<li data-start="2942" data-end="2957">
+<p data-start="2944" data-end="2957">Monaco Editor</p>
+</li>
+<li data-start="2958" data-end="2971">
+<p data-start="2960" data-end="2971">Markdown-it</p>
+</li>
+<li data-start="2972" data-end="2995">
+<p data-start="2974" data-end="2995">Shiki (VS Code theme)</p>
+</li>
+</ul>
+<p data-start="2997" data-end="3005">You get:</p>
+<ul data-start="3006" data-end="3067">
+<li data-start="3006" data-end="3017">
+<p data-start="3008" data-end="3017">✔️ Colors</p>
+</li>
+<li data-start="3018" data-end="3029">
+<p data-start="3020" data-end="3029">✔️ Tables</p>
+</li>
+<li data-start="3030" data-end="3041">
+<p data-start="3032" data-end="3041">✔️ Emojis</p>
+</li>
+<li data-start="3042" data-end="3067">
+<p data-start="3044" data-end="3067">❌ Exact ChatGPT spacing</p>
+</li>
+</ul>
+<p data-start="3069" data-end="3085">Still very good.</p>
+<hr data-start="3087" data-end="3090">
+<h3 data-start="3092" data-end="3135">🥉 OPTION 3 (IMPOSSIBLE – DO NOT CHASE)</h3>
+<p data-start="3136" data-end="3174">❌ Rebuilding ChatGPT UI via copied CSS</p>
+<p data-start="3176" data-end="3186">This will:</p>
+<ul data-start="3187" data-end="3239">
+<li data-start="3187" data-end="3207">
+<p data-start="3189" data-end="3207">Break every update</p>
+</li>
+<li data-start="3208" data-end="3222">
+<p data-start="3210" data-end="3222">Waste months</p>
+</li>
+<li data-start="3223" data-end="3239">
+<p data-start="3225" data-end="3239">Never be exact</p>
+</li>
+</ul>
+<p data-start="3241" data-end="3275">You are already hitting this wall.</p>
+<hr data-start="3277" data-end="3280">
+<h2 data-start="3282" data-end="3338">5️⃣ About “AI Code Editor CSS” (your direct question)</h2>
+<p data-start="3340" data-end="3350">You asked:</p>
+<blockquote data-start="3352" data-end="3438">
+<p data-start="3354" data-end="3438">“What CSS style idea should I give to AI code editor so it looks like your replies?”</p>
+</blockquote>
+<h3 data-start="3440" data-end="3470">Correct instruction to AI:</h3>
+<blockquote data-start="3472" data-end="3653">
+<p data-start="3474" data-end="3561">“Do NOT clone ChatGPT CSS.<br data-start="3500" data-end="3503">
+Recreate a <strong data-start="3516" data-end="3554">reading-focused AI response viewer</strong> using:</p>
+<ul data-start="3564" data-end="3653">
+<li data-start="3564" data-end="3582">
+<p data-start="3566" data-end="3582">Prose typography</p>
+</li>
+<li data-start="3585" data-end="3602">
+<p data-start="3587" data-end="3602">Neutral spacing</p>
+</li>
+<li data-start="3605" data-end="3623">
+<p data-start="3607" data-end="3623">Soft code blocks</p>
+</li>
+<li data-start="3626" data-end="3653">
+<p data-start="3628" data-end="3653">Markdown-first rendering”</p>
+</li>
+</ul>
+</blockquote>
+<h3 data-start="3655" data-end="3684">Give it THIS instruction:</h3>
+<pre class="overflow-visible! px-0!" data-start="3686" data-end="3889"><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1">diff</div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"><button class="flex gap-1 items-center select-none py-1" aria-label="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon-sm"><use href="/cdn/assets/sprites-core-jtokmzgv.svg#ce3544" fill="currentColor"></use></svg>Copy code</button></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre!"><span><span>Design a response viewer inspired by ChatGPT:
+</span><span><span class="hljs-deletion">- Max width 48rem</span></span><span>
+</span><span><span class="hljs-deletion">- Prose-based typography</span></span><span>
+</span><span><span class="hljs-deletion">- Clear heading hierarchy</span></span><span>
+</span><span><span class="hljs-deletion">- Soft gray code blocks</span></span><span>
+</span><span><span class="hljs-deletion">- Emoji-safe fonts</span></span><span>
+</span><span><span class="hljs-deletion">- No UI chrome</span></span><span>
+</span><span><span class="hljs-deletion">- Reading-first layout</span></span><span>
+</span></span></code></div></div></pre>
+<p data-start="3891" data-end="3902">This works.</p>
+<hr data-start="3904" data-end="3907">
+<h2 data-start="3909" data-end="3966">6️⃣ Gemini Flash / Gemini 1.5 / Gemini Pro (important)</h2>
+<h3 data-start="3968" data-end="4010">Gemini models DO NOT expose stable DOM</h3>
+<ul data-start="4012" data-end="4129">
+<li data-start="4012" data-end="4050">
+<p data-start="4014" data-end="4050">Gemini Flash → Fast, minimal styling</p>
+</li>
+<li data-start="4051" data-end="4091">
+<p data-start="4053" data-end="4091">Gemini 1.5 Pro → Rich but unstable DOM</p>
+</li>
+<li data-start="4092" data-end="4129">
+<p data-start="4094" data-end="4129">Gemini Advanced → Heavily sandboxed</p>
+</li>
+</ul>
+<p data-start="4131" data-end="4183">👉 Bookmarklet capture works<br>
+👉 CSS cloning does NOT</p>
+<p data-start="4185" data-end="4220">Your system should treat Gemini as:</p>
+<ul data-start="4221" data-end="4271">
+<li data-start="4221" data-end="4247">
+<p data-start="4223" data-end="4247"><strong data-start="4223" data-end="4247">HTML snapshot source</strong></p>
+</li>
+<li data-start="4248" data-end="4271">
+<p data-start="4250" data-end="4271">Not a style reference</p>
+</li>
+</ul>
+<hr data-start="4273" data-end="4276">
+<h2 data-start="4278" data-end="4324">7️⃣ FINAL RECOMMENDATION (listen carefully)</h2>
+<h3 data-start="4326" data-end="4353">Your best architecture:</h3>
+<pre class="overflow-visible! px-0!" data-start="4355" data-end="4492"><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1">css</div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"><button class="flex gap-1 items-center select-none py-1" aria-label="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon-sm"><use href="/cdn/assets/sprites-core-jtokmzgv.svg#ce3544" fill="currentColor"></use></svg>Copy code</button></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre!"><span><span><span class="hljs-selector-attr">[ Browser AI ]</span></span><span>
+     ↓
+</span><span><span class="hljs-selector-attr">[ Bookmarklet Capture ]</span></span><span>
+     ↓
+</span><span><span class="hljs-selector-attr">[ Save innerHTML ]</span></span><span>
+     ↓
+</span><span><span class="hljs-selector-attr">[ Minimal Viewer HTML ]</span></span><span>
+     ↓
+</span><span><span class="hljs-selector-attr">[ Clean Prose CSS ]</span></span><span>
+</span></span></code></div></div></pre>
+<p data-start="4494" data-end="4498">NOT:</p>
+<pre class="overflow-visible! px-0!" data-start="4499" data-end="4538"><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="flex items-center text-token-text-secondary px-4 py-2 text-xs font-sans justify-between h-9 bg-token-sidebar-surface-primary select-none rounded-t-2xl corner-t-superellipse/1.1">powershell</div><div class="sticky top-[calc(--spacing(9)+var(--header-height))] @w-xl/main:top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"><button class="flex gap-1 items-center select-none py-1" aria-label="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon-sm"><use href="/cdn/assets/sprites-core-jtokmzgv.svg#ce3544" fill="currentColor"></use></svg>Copy code</button></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre!"><span><span><span class="hljs-built_in">Copy</span></span><span> ChatGPT CSS → Paste → Pray
+</span></span></code></div></div></pre>
+<hr data-start="4540" data-end="4543">
+<h2 data-start="4545" data-end="4577">8️⃣ One-line truth (pin this)</h2>
+<blockquote data-start="4579" data-end="4650">
+<p data-start="4581" data-end="4650"><strong data-start="4581" data-end="4650">You don’t want ChatGPT’s CSS.<br data-start="4612" data-end="4615">
+You want ChatGPT’s readability.</strong></p>
+</blockquote>
+<p data-start="4652" data-end="4681">And you’re already 80% there.</p>
+<p data-start="4683" data-end="4700">If you want next:</p>
+<ul data-start="4701" data-end="4817">
+<li data-start="4701" data-end="4742">
+<p data-start="4703" data-end="4742">I can design the <strong data-start="4720" data-end="4742">perfect viewer.css</strong></p>
+</li>
+<li data-start="4743" data-end="4780">
+<p data-start="4745" data-end="4780">Or a <strong data-start="4750" data-end="4780">Monaco + Markdown renderer</strong></p>
+</li>
+<li data-start="4781" data-end="4817">
+<p data-start="4783" data-end="4817">Or a <strong data-start="4788" data-end="4817">single-file HTML template</strong></p>
+</li>
+</ul>
+<p data-start="4819" data-end="4842" data-is-last-node="" data-is-only-node="">Just tell me which one.</p></div></div></div></div><div class="z-0 flex min-h-[46px] justify-start"><div class="touch:-me-2 touch:-ms-3.5 -ms-2.5 -me-1 flex flex-wrap items-center gap-y-4 p-1 select-none touch:w-[calc(100%+--spacing(3.5))] -mt-1 w-[calc(100%+--spacing(2.5))] duration-[1.5s] focus-within:transition-none hover:transition-none touch:pointer-events-auto pointer-events-none [mask-image:linear-gradient(to_right,black_33%,transparent_66%)] [mask-size:300%_100%] [mask-position:100%_0%] motion-safe:transition-[mask-position] group-hover/turn-messages:pointer-events-auto group-hover/turn-messages:[mask-position:0_0] group-focus-within/turn-messages:pointer-events-auto group-focus-within/turn-messages:[mask-position:0_0] has-data-[state=open]:pointer-events-auto has-data-[state=open]:[mask-position:0_0]" style="mask-position: 0% 0%;"><button class="text-token-text-secondary hover:bg-token-bg-secondary rounded-lg" aria-label="Copy" aria-pressed="false" data-testid="copy-turn-action-button" data-state="closed"><span class="flex items-center justify-center touch:w-10 h-8 w-8"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon"><use href="/cdn/assets/sprites-core-jtokmzgv.svg#ce3544" fill="currentColor"></use></svg></span></button><button class="text-token-text-secondary hover:bg-token-bg-secondary rounded-lg" aria-label="Good response" aria-pressed="false" data-testid="good-response-turn-action-button" data-state="closed"><span class="flex items-center justify-center touch:w-10 h-8 w-8"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon"><use href="/cdn/assets/sprites-core-jtokmzgv.svg#51753c" fill="currentColor"></use></svg></span></button><button class="text-token-text-secondary hover:bg-token-bg-secondary rounded-lg" aria-label="Bad response" aria-pressed="false" data-testid="bad-response-turn-action-button" data-state="closed"><span class="flex items-center justify-center touch:w-10 h-8 w-8"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon"><use href="/cdn/assets/sprites-core-jtokmzgv.svg#2126ae" fill="currentColor"></use></svg></span></button><button class="text-token-text-secondary hover:bg-token-bg-secondary rounded-lg" aria-label="Share" aria-pressed="false" data-state="closed"><span class="flex items-center justify-center touch:w-10 h-8 w-8"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon"><use href="/cdn/assets/sprites-core-jtokmzgv.svg#630ca2" fill="currentColor"></use></svg></span></button><button class="text-token-text-secondary hover:bg-token-bg-secondary touch:w-10 flex h-8 w-8 items-center justify-center rounded-lg" aria-label="More actions" type="button" id="radix-_r_23g_" aria-haspopup="menu" aria-expanded="false" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon"><use href="/cdn/assets/sprites-core-jtokmzgv.svg#f6d0e2" fill="currentColor"></use></svg></button></div></div><div class="mt-3 w-full empty:hidden"><div class="text-center"></div></div></div></div></article></div><div aria-hidden="true" data-edge="true" class="pointer-events-none h-px w-px absolute bottom-0"></div></div><div id="thread-bottom-container" class="sticky bottom-0 group/thread-bottom-container relative isolate z-10 w-full basis-auto has-data-has-thread-error:pt-2 has-data-has-thread-error:[box-shadow:var(--sharp-edge-bottom-shadow)] md:border-transparent md:pt-0 dark:border-white/20 md:dark:border-transparent print:hidden content-fade single-line flex flex-col"><div class="relative h-0"><div style="opacity: 1;"><button class="cursor-pointer absolute z-30 rounded-full bg-clip-padding border text-token-text-secondary border-token-border-default end-1/2 translate-x-1/2 bg-token-main-surface-primary w-8 h-8 flex items-center justify-center print:hidden bottom-[calc(100%+6*var(--spacing))]"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon text-token-text-primary"><use href="/cdn/assets/sprites-core-jtokmzgv.svg#ac89a7" fill="currentColor"></use></svg></button></div></div><div id="thread-bottom"><div class="text-base mx-auto [--thread-content-margin:--spacing(4)] @w-sm/main:[--thread-content-margin:--spacing(6)] @w-lg/main:[--thread-content-margin:--spacing(16)] px-(--thread-content-margin)"><div class="[--thread-content-max-width:40rem] @w-lg/main:[--thread-content-max-width:48rem] mx-auto max-w-(--thread-content-max-width) flex-1 mb-4"><div class="flex justify-center empty:hidden"></div><div class="pointer-events-auto relative z-1 flex h-(--composer-container-height,100%) max-w-full flex-(--composer-container-flex,1) flex-col"><button type="button" class="invisible absolute self-center" aria-hidden="true" tabindex="-1" aria-haspopup="dialog" aria-expanded="false" aria-controls="radix-_R_2et4l8l5eb33ih6kcm_" data-state="closed" name="context-connector-pasted-link-popover-trigger"></button><div class="absolute start-0 end-0 bottom-full z-20"></div></div></div></div></div></div></div></div>
+        </div>
+        
+        <div class="footer">
+            Captured by Lossless Harvest System - Render Mode
+        </div>
+    </div>
+</body>
+</html>

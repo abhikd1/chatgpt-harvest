@@ -1,0 +1,32 @@
+{
+    "manifest_version": 3,
+    "name": "Lossless Render Capture",
+    "version": "1.0",
+    "description": "Capture AI responses with visual formatting preserved",
+    "permissions": [
+        "activeTab",
+        "clipboardWrite",
+        "scripting"
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "icon16.png",
+            "48": "icon48.png",
+            "128": "icon128.png"
+        }
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "*://chat.openai.com/*",
+                "*://chatgpt.com/*",
+                "*://gemini.google.com/*",
+                "*://claude.ai/*"
+            ],
+            "js": [
+                "content.js"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Render Capture - 2026-01-14 13:38:36</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .metadata {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+            color: #666;
+            border-left: 4px solid #007bff;
+        }
+        
+        .metadata strong {
+            color: #333;
+        }
+        
+        .content {
+            font-size: 16px;
+            line-height: 1.8;
+        }
+        
+        .content h1 {
+            font-size: 2em;
+            margin: 1em 0 0.5em 0;
+            color: #1a1a1a;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 0.3em;
+        }
+        
+        .content h2 {
+            font-size: 1.5em;
+            margin: 1.2em 0 0.6em 0;
+            color: #2c3e50;
+        }
+        
+        .content h3 {
+            font-size: 1.2em;
+            margin: 1em 0 0.5em 0;
+            color: #34495e;
+        }
+        
+        .content p {
+            margin: 1em 0;
+        }
+        
+        .content ul, .content ol {
+            margin: 1em 0;
+            padding-left: 2em;
+        }
+        
+        .content li {
+            margin: 0.5em 0;
+        }
+        
+        .content code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+        
+        .content pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 1.5em 0;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .content pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+        }
+        
+        .content table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #dee2e6;
+            font-weight: 600;
+        }
+        
+        .content table td {
+            padding: 12px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .content table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .content blockquote {
+            border-left: 4px solid #007bff;
+            padding-left: 20px;
+            margin: 1.5em 0;
+            color: #555;
+            font-style: italic;
+        }
+        
+        .content strong {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .content em {
+            font-style: italic;
+            color: #555;
+        }
+        
+        .content hr {
+            border: none;
+            border-top: 2px solid #e0e0e0;
+            margin: 2em 0;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            text-align: center;
+            color: #999;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="metadata">
+            <strong>Source:</strong> https://chatgpt.com/c/6964d8e1-78ec-8330-b0b2-ff56f58d1d9d<br>
+            <strong>Captured:</strong> 2026-01-14 13:38:36<br>
+            <strong>Type:</strong> Render Capture (HTML Snapshot)
+        </div>
+        
+        <div class="content">
+<span>
+
+</span><span><span class="hljs-comment">/* SEND TO SERVER */</span></span><span>
+</span><span><span class="hljs-title function_">fetch</span></span><span>(</span><span><span class="hljs-string">'http://localhost:8765'</span></span><span>,{
+ </span><span><span class="hljs-attr">method</span></span><span>:</span><span><span class="hljs-string">'POST'</span></span><span>,
+ </span><span><span class="hljs-attr">headers</span></span><span>:{</span><span><span class="hljs-string">'Content-Type'</span></span><span>:</span><span><span class="hljs-string">'application/json'</span></span><span>},
+ </span><span><span class="hljs-attr">body</span></span><span>:</span><span><span class="hljs-title class_">JSON</span></span><span>.</span><span><span class="hljs-title function_">stringify</span></span><span>({</span><span><span class="hljs-attr">html</span></span><span>:html,</span><span><span class="hljs-attr">source</span></span><span>:source})
+})
+.</span><span><span class="hljs-title function_">then</span></span><span>(</span><span><span class="hljs-function"><span class="hljs-params">r</span></span></span><span>=&gt;r.</span><span><span class="hljs-title function_">json</span></span><span>())
+.</span><span><span class="hljs-title function_">then</span></span><span>(</span><span><span class="hljs-function"><span class="hljs-params">d</span></span></span><span>=&gt;{
+ </span><span><span class="hljs-keyword">if</span></span><span>(d.</span><span><span class="hljs-property">status</span></span><span>===</span><span><span class="hljs-string">'success'</span></span><span>){
+  </span><span><span class="hljs-title function_">alert</span></span><span>(</span><span><span class="hljs-string">'✅ Captured!\n\n'</span></span><span>+d.</span><span><span class="hljs-property">message</span></span><span>);
+ }</span><span><span class="hljs-keyword">else</span></span><span>{
+  </span><span><span class="hljs-title function_">alert</span></span><span>(</span><span><span class="hljs-string">'❌ Failed:\n\n'</span></span><span>+d.</span><span><span class="hljs-property">message</span></span><span>);
+ }
+})</span>
+        </div>
+        
+        <div class="footer">
+            Captured by Lossless Harvest System - Render Mode
+        </div>
+    </div>
+</body>
+</html>
