@@ -339,6 +339,60 @@
                 margin-left: 0;
             }
         }
+
+        /* 📦 BATCH SELECTION BAR */
+        .batch-selection-bar {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            transition: bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1001;
+        }
+
+        .batch-selection-bar.visible {
+            bottom: 30px;
+        }
+
+        .batch-stat-count {
+            font-weight: 600;
+            font-size: 14px;
+            border-right: 1px solid #4b5563;
+            padding-right: 15px;
+        }
+
+        .batch-action-btn {
+            background: none;
+            border: 1px solid #4b5563;
+            color: #e5e7eb;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .batch-action-btn:hover {
+            background: #374151;
+            border-color: #6b7280;
+            color: #fff;
+        }
+
+        .batch-delete-btn:hover {
+            border-color: #ef4444;
+            color: #fca5a5;
+        }
     </style>
 </head>
 
@@ -375,6 +429,17 @@
 
     <div class="container">
         {{CONTENT_PLACEHOLDER}}
+    </div>
+
+    <div class="batch-selection-bar" id="batch-bar">
+        <span class="batch-stat-count" id="batch-count">0 Selected</span>
+        <button class="batch-action-btn" onclick="copySelected()"><span style="font-size:1.2em;">📋</span> Copy
+            Selected</button>
+        <button class="batch-action-btn" onclick="exportSelectedMD()"><span style="font-size:1.2em;">📝</span> Export
+            MD</button>
+        <button class="batch-action-btn batch-delete-btn" onclick="deleteSelectedBatch()"><span
+                style="font-size:1.2em;">🗑️</span> Delete Selected</button>
+        <button class="batch-action-btn" onclick="clearSelection()" style="border:none; opacity:0.6;">✕</button>
     </div>
 
     <script>
@@ -787,6 +852,109 @@
                 navigateSearch(e.shiftKey ? -1 : 1);
             }
         });
+
+        // 📦 BATCH SELECTION LOGIC
+        function refreshBatchUI() {
+            const selected = document.querySelectorAll('.entry-select:checked');
+            const bar = document.getElementById('batch-bar');
+            const countDisplay = document.getElementById('batch-count');
+
+            if (selected.length > 0) {
+                countDisplay.textContent = `${selected.length} Selected`;
+                bar.classList.add('visible');
+            } else {
+                bar.classList.remove('visible');
+            }
+        }
+
+        function clearSelection() {
+            document.querySelectorAll('.entry-select').forEach(cb => cb.checked = false);
+            refreshBatchUI();
+        }
+
+        function getSelectedEntries() {
+            const selectedBoxes = document.querySelectorAll('.entry-select:checked');
+            return Array.from(selectedBoxes).map(cb => {
+                const entry = cb.closest('.harvest-entry');
+                return {
+                    id: entry.id,
+                    content: entry.querySelector('.content'),
+                    metadata: entry.querySelector('.metadata').innerText
+                };
+            });
+        }
+
+        async function copySelected() {
+            const selected = getSelectedEntries();
+            const combinedHtml = selected.map(s => s.content.innerHTML).join('<hr style="margin: 40px 0; border: 1px dashed #ccc;">');
+
+            const blob = new Blob([combinedHtml], { type: 'text/html' });
+            const data = [new ClipboardItem({ 'text/html': blob })];
+
+            try {
+                await navigator.clipboard.write(data);
+                alert(`✨ ${selected.length} items copied to clipboard!`);
+            } catch (err) {
+                const text = combinedHtml.replace(/<[^>]*>/g, '');
+                await navigator.clipboard.writeText(text);
+                alert('✅ Text copied!');
+            }
+        }
+
+        async function exportSelectedMD() {
+            const selected = getSelectedEntries();
+            const turndownService = new TurndownService({
+                headingStyle: 'atx',
+                codeBlockStyle: 'fenced'
+            });
+
+            let markdown = "# AI Harvest Selection\n\n";
+            selected.forEach((s, index) => {
+                markdown += `## Selection ${index + 1}\n`;
+                markdown += `> ${s.metadata}\n\n`;
+                markdown += turndownService.turndown(s.content.innerHTML);
+                markdown += "\n\n---\n\n";
+            });
+
+            const blob = new Blob([markdown], { type: 'text/markdown' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.download = `harvest_selection_${new Date().getTime()}.md`;
+            a.href = url;
+            a.click();
+        }
+
+        async function deleteSelectedBatch() {
+            const selected = getSelectedEntries();
+            if (!confirm(`🚨 Delete ${selected.length} entries PERMANENTLY?`)) return;
+
+            const ids = selected.map(s => s.id);
+            try {
+                const response = await fetch('/batch_delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ids: ids })
+                });
+
+                if (response.ok) {
+                    selected.forEach(s => {
+                        const el = document.getElementById(s.id);
+                        el.style.opacity = '0';
+                        el.style.transform = 'scale(0.9)';
+                        setTimeout(() => el.remove(), 400);
+                    });
+                    setTimeout(() => {
+                        refreshBatchUI();
+                        generateIndex();
+                    }, 500);
+                } else {
+                    alert('Batch delete failed.');
+                }
+            } catch (e) {
+                alert('Error connecting to server.');
+            }
+        }
+
     </script>
 </body>
 

@@ -30,6 +30,9 @@ class UpdateData(BaseModel):
 class DeleteData(BaseModel):
     id: str
 
+class BatchDeleteData(BaseModel):
+    ids: list[str]
+
 MASTER_FILE = Path("master_harvest.html")
 TEMPLATE_FILE = Path("master_template.html")
 
@@ -56,7 +59,8 @@ def append_to_master(new_html: str, source: str):
     wrapped_content = f"""
         <!-- ENTRY_START_{entry_id} -->
         <div class="harvest-entry" id="{entry_id}" style="margin-top: 50px; border-top: 2px dashed #374151; padding-top: 20px; position: relative;">
-            <div class="entry-controls" style="position: absolute; top: 10px; right: 0; display: flex; gap: 10px; opacity: 0.2; transition: opacity 0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.2">
+            <div class="entry-controls" style="position: absolute; top: 10px; right: 0; display: flex; gap: 10px; align-items: center; opacity: 0.2; transition: opacity 0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.2">
+                <input type="checkbox" class="entry-select" data-id="{entry_id}" onchange="refreshBatchUI()" style="width: 18px; height: 18px; cursor: pointer; margin-right: 10px;">
                 <button onclick="copyEntry('{entry_id}')" class="control-btn copy-btn" title="Copy">📋</button>
                 <button onclick="editEntry('{entry_id}')" class="control-btn edit-btn" title="Edit">✏️</button>
                 <button onclick="saveEntry('{entry_id}')" class="control-btn save-btn" style="display:none;" title="Save">💾</button>
@@ -150,6 +154,26 @@ async def delete_entry(data: DeleteData):
         new_content = prefix + suffix
         with open(MASTER_FILE, 'w', encoding='utf-8') as f:
             f.write(new_content)
+        return {"status": "success"}
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
+
+@app.post("/batch_delete")
+async def batch_delete(data: BatchDeleteData):
+    try:
+        with open(MASTER_FILE, 'r', encoding='utf-8') as f:
+            content = f.read()
+            
+        for entry_id in data.ids:
+            start_marker = f"<!-- ENTRY_START_{entry_id} -->"
+            end_marker = f"<!-- ENTRY_END_{entry_id} -->"
+            if start_marker in content and end_marker in content:
+                prefix, remainder = content.split(start_marker)
+                _, suffix = remainder.split(end_marker)
+                content = prefix + suffix
+        
+        with open(MASTER_FILE, 'w', encoding='utf-8') as f:
+            f.write(content)
         return {"status": "success"}
     except Exception as e:
         return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
