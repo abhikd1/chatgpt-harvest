@@ -214,7 +214,6 @@
         /* 🤖 AI SUMMARY STYLES */
         .tldr-container {
             display: none;
-            /* 🚀 HIDDEN BY DEFAULT */
             background: rgba(59, 130, 246, 0.05);
             border-left: 3px solid #3b82f6;
             padding: 12px 18px;
@@ -223,6 +222,24 @@
             border-radius: 0 8px 8px 0;
             line-height: 1.5;
             position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .tldr-container.visible {
+            display: block !important;
+            animation: tldr-slide 0.3s ease-out;
+        }
+
+        @keyframes tldr-slide {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .tldr-container strong {
@@ -1150,8 +1167,7 @@
             // 🤖 TOGGLE SUMMARY AREA
             const tldrBox = entry.querySelector('.tldr-container');
             if (tldrBox && !isVisible) {
-                const isHidden = window.getComputedStyle(tldrBox).display === 'none';
-                tldrBox.style.display = isHidden ? 'block' : 'none';
+                tldrBox.classList.toggle('visible');
             }
 
             if (!isVisible) popover.querySelector('input').focus();
@@ -1174,7 +1190,7 @@
 
             // ENSURE TL;DR BOX IS VISIBLE WHEN STARTING
             const tldrBox = entry.querySelector('.tldr-container');
-            if (tldrBox) tldrBox.style.display = 'block';
+            if (tldrBox) tldrBox.classList.add('visible');
 
             tldrSpan.innerText = "🧠 Step 1: LLaMA Reasoning (6-7 GB RAM)...";
             aiBtn.classList.add('processing');
@@ -1229,7 +1245,7 @@
             const tldrSpan = entry.querySelector('.tldr-content');
 
             const tldrBox = entry.querySelector('.tldr-container');
-            if (tldrBox) tldrBox.style.display = 'block';
+            if (tldrBox) tldrBox.classList.add('visible');
 
             tldrSpan.innerText = "🧠 Step 1: LLaMA Reasoning (6-7 GB RAM)...";
             if (aiBtn) aiBtn.classList.add('processing');

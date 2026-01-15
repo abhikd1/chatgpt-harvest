@@ -243,7 +243,7 @@ def append_to_master(new_html: str, source: str):
                 <span>Captured on: {timestamp} | Source: {source}</span>
                 <div class="entry-tags" id="tags-{entry_id}" style="display: flex; gap: 5px; flex-wrap: wrap;"></div>
             </div>
-            <div class="tldr-container" id="tldr-container-{entry_id}" style="display: none; background: rgba(59, 130, 246, 0.05); border-left: 3px solid #3b82f6; padding: 10px 15px; margin-bottom: 15px; font-size: 13px; font-style: italic; color: var(--text-primary); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <div class="tldr-container" id="tldr-container-{entry_id}" style="background: rgba(59, 130, 246, 0.05); border-left: 3px solid #3b82f6; padding: 10px 15px; margin-bottom: 15px; font-size: 13px; font-style: italic; color: var(--text-primary); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                 <strong>⚡ AI TL;DR:</strong> <span class="tldr-content" id="tldr-{entry_id}">Generating summary...</span>
             </div>
             <div class="content">
