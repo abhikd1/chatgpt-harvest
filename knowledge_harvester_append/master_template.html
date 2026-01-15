@@ -1144,6 +1144,13 @@
             const isVisible = popover.style.display === 'flex';
             document.querySelectorAll('.ai-entry-popover').forEach(p => p.style.display = 'none'); // Close others
             popover.style.display = isVisible ? 'none' : 'flex';
+
+            // SHOW THE SUMMARY AREA IF IT EXISTS BUT IS HIDDEN
+            const tldrBox = entry.querySelector('.tldr-container');
+            if (tldrBox && tldrBox.style.display === 'none' && !isVisible) {
+                tldrBox.style.display = 'block';
+            }
+
             if (!isVisible) popover.querySelector('input').focus();
         }
 
@@ -1161,6 +1168,11 @@
             const tldrSpan = entry.querySelector('.tldr-content');
 
             closeEntryAI(id);
+
+            // ENSURE TL;DR BOX IS VISIBLE WHEN STARTING
+            const tldrBox = entry.querySelector('.tldr-container');
+            if (tldrBox) tldrBox.style.display = 'block';
+
             tldrSpan.innerText = "🧠 Step 1: LLaMA Reasoning (6-7 GB RAM)...";
             aiBtn.classList.add('processing');
 
@@ -1212,6 +1224,9 @@
             const aiBtn = entry.querySelector('.ai-btn');
             const content = entry.querySelector('.content').innerText;
             const tldrSpan = entry.querySelector('.tldr-content');
+
+            const tldrBox = entry.querySelector('.tldr-container');
+            if (tldrBox) tldrBox.style.display = 'block';
 
             tldrSpan.innerText = "🧠 Step 1: LLaMA Reasoning (6-7 GB RAM)...";
             if (aiBtn) aiBtn.classList.add('processing');
