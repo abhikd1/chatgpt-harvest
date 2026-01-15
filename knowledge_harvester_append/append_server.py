@@ -283,12 +283,17 @@ file_lock = asyncio.Lock()
 @app.post("/")
 async def capture(data: CaptureData):
     try:
-        print(f"[{datetime.now()}] CAPTURE RECEIVED FROM SOURCE: {data.source}")
+        print(f"\n{'='*60}")
+        print(f"[{datetime.now()}] NEW CAPTURE REQUEST")
+        print(f"SOURCE: {data.source}")
+        print(f"HTML LENGTH: {len(data.html)} characters")
+        print(f"{'='*60}\n")
         entry_id = append_to_master(data.html, data.source)
         # Background task for TL;DR and TAGS
         asyncio.create_task(process_tldr_and_update(entry_id, data.html))
         return {"status": "success", "url": "http://localhost:8771/view", "id": entry_id}
     except Exception as e:
+        print(f"ERROR IN CAPTURE: {str(e)}")
         return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
 
 async def update_file_tldr(entry_id: str, tldr: str, tags: list = None):

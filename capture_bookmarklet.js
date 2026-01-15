@@ -12,7 +12,8 @@ javascript: (function () {
         let container = document.createElement('div');
         container.appendChild(range.cloneContents());
         html = container.innerHTML;
-        source = 'Selected Content';
+        // 🏷️ CAPTURE PAGE METADATA
+        source = `${document.title} (${window.location.hostname})`;
     }
 
     // If no selection, try to find the last AI response
@@ -88,8 +89,8 @@ javascript: (function () {
         return;
     }
 
-    // Send to server
-    fetch('http://localhost:8766', {
+    // Send to server - UPDATED TO MASTER PORT 8771
+    fetch('http://localhost:8771', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
