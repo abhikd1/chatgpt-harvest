@@ -313,8 +313,8 @@ async def update_file_tldr(entry_id: str, tldr: str, tags: list = None):
             # 2. Update TAGS
             if tags:
                 tag_html = "".join([f'<span class="tag-badge" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; margin-left: 5px;">{t}</span>' for t in tags])
-                pattern_tags = rf'id="tags-{entry_id}">.*?</div>'
-                repl_tags = f'id="tags-{entry_id}">{tag_html}</div>'
+                pattern_tags = rf'id="tags-{entry_id}"[^>]*>.*?</div>'
+                repl_tags = f'id="tags-{entry_id}" style="display: flex; gap: 5px; flex-wrap: wrap;">{tag_html}</div>'
                 new_entry_block = re.sub(pattern_tags, repl_tags, new_entry_block, flags=re.DOTALL)
             
             updated_file = prefix + start_marker + new_entry_block + f"<!-- ENTRY_END_{entry_id} -->" + suffix
@@ -324,18 +324,25 @@ async def update_file_tldr(entry_id: str, tldr: str, tags: list = None):
         print(f"File update failed: {e}")
 
 async def process_tldr_and_update(entry_id: str, content: str, system_prompt: str = None, user_prompt: str = ""):
-    result = await generate_deep_research_tldr(content, system_prompt, user_prompt)
-    await update_file_tldr(entry_id, result["tldr"], result["tags"])
+    try:
+        result = await generate_deep_research_tldr(content, system_prompt, user_prompt)
+        await update_file_tldr(entry_id, result["tldr"], result["tags"])
+    except Exception as e:
+        print(f"FAILED TO PROCESS TLDR for {entry_id}: {e}")
+        await update_file_tldr(entry_id, "AI Summary failed. Please check logs.")
 
 @app.post("/summarize")
 async def summarize(data: SummarizeData):
     try:
-        tldr = await generate_deep_research_tldr(data.content, data.system_prompt, data.user_prompt)
+        result = await generate_deep_research_tldr(data.content, data.system_prompt, data.user_prompt)
+        # Extract tldr string and tags list properly
+        tldr_text = result["tldr"]
+        tags = result["tags"]
         # Still update the file for persistence
-        asyncio.create_task(update_file_tldr(data.id, tldr))
-        return {"status": "success", "tldr": tldr}
+        asyncio.create_task(update_file_tldr(data.id, tldr_text, tags))
+        return {"status": "success", "tldr": tldr_text, "tags": tags}
     except Exception as e:
-        return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
+        return JSONResponse(status_code=500, content={"status": "error", "message": f"Summarize failed: {str(e)}"})
 
 @app.post("/summarize_all")
 async def summarize_all(data: SummarizeData):
