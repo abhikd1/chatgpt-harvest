@@ -74,7 +74,12 @@ document.getElementById('captureBtn').addEventListener('click', async () => {
                     // Remove UI buttons from fragment
                     container.querySelectorAll('svg, button, .sr-only').forEach(x => x.remove());
 
-                    return { html: container.innerHTML, source: "Selection" };
+                    // 🏷️ CAPTURE PAGE METADATA
+                    const pageTitle = document.title || "Unknown Page";
+                    const pageHost = window.location.hostname || "Unknown Host";
+                    const fullSource = `${pageTitle} (${pageHost})`;
+
+                    return { html: container.innerHTML, source: fullSource };
                 }
 
                 // --- CASE 2: AUTOMATIC ASSISTANT BLOCK ---
@@ -95,19 +100,26 @@ document.getElementById('captureBtn').addEventListener('click', async () => {
                 }
 
                 clone.querySelectorAll('svg, button, .sr-only, [aria-hidden="true"]').forEach(x => x.remove());
-                return { html: clone.innerHTML, source: "Assistant Message" };
+
+                // 🏷️ CAPTURE PAGE METADATA
+                const pageTitle = document.title || "Unknown Page";
+                const pageHost = window.location.hostname || "Unknown Host";
+                const fullSource = `${pageTitle} (${pageHost})`;
+
+                return { html: clone.innerHTML, source: fullSource };
             }
         });
 
         if (!results || !results[0].result || results[0].result.html === '') {
             statusDiv.textContent = 'No content found!';
-            statusDiv.className = 'status error'; // Ensure error class is applied
+            statusDiv.className = 'status error';
             return;
         }
 
-        const scriptResult = results[0].result; // Renamed to avoid conflict with 'data' from fetch response
+        const scriptResult = results[0].result;
 
-        const response = await fetch('http://localhost:8770', {
+        // 🚀 REDIRECT TO MASTER HARVEST PORT (8771)
+        const response = await fetch('http://localhost:8771', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

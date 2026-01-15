@@ -283,6 +283,7 @@ file_lock = asyncio.Lock()
 @app.post("/")
 async def capture(data: CaptureData):
     try:
+        print(f"[{datetime.now()}] CAPTURE RECEIVED FROM SOURCE: {data.source}")
         entry_id = append_to_master(data.html, data.source)
         # Background task for TL;DR and TAGS
         asyncio.create_task(process_tldr_and_update(entry_id, data.html))
