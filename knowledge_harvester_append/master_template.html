@@ -763,29 +763,31 @@
             }
             generateIndex();
         }
-
+        // GENERATE TOC
         function generateIndex() {
             const container = document.getElementById('toc-entries');
-            container.innerHTML = '';
-            const entries = document.querySelectorAll('.harvest-entry');
+            if (!container) return;
+            container.innerHTML = '<h3>Harvest Index</h3>';
 
-            entries.forEach((entry, index) => {
+            const entries = document.querySelectorAll('.harvest-entry');
+            if (entries.length === 0) {
+                container.innerHTML += '<div style="font-size:13px; color:var(--text-secondary); font-style:italic;">No entries yet. Capture something!</div>';
+                return;
+            }
+
+            entries.forEach(entry => {
                 const id = entry.id;
-                const content = entry.querySelector('.content');
                 const metadata = entry.querySelector('.metadata').innerText;
+                const content = entry.querySelector('.content').innerText;
                 const time = metadata.split('|')[0].replace('Captured on: ', '').trim();
 
-                // Priority title extraction
-                let title = "Entry " + (index + 1);
-                const h = content.querySelector('h1, h2, h3');
-                const b = content.querySelector('strong, b');
-
-                if (h && h.innerText.trim()) {
-                    title = h.innerText.trim();
-                } else if (b && b.innerText.trim()) {
-                    title = b.innerText.trim();
-                } else if (content.innerText.trim()) {
-                    title = content.innerText.trim().substring(0, 40) + "...";
+                // Smart Title: 1st H1/H2 or first 4-5 words
+                let title = "Update " + time;
+                const hTag = entry.querySelector('h1, h2, h3');
+                if (hTag) {
+                    title = hTag.innerText;
+                } else {
+                    title = content.split('\n')[0].substring(0, 30) + "...";
                 }
 
                 // AI TL;DR Extraction
