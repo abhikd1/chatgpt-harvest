@@ -213,6 +213,8 @@
 
         /* 🤖 AI SUMMARY STYLES */
         .tldr-container {
+            display: none;
+            /* 🚀 HIDDEN BY DEFAULT */
             background: rgba(59, 130, 246, 0.05);
             border-left: 3px solid #3b82f6;
             padding: 12px 18px;
@@ -1145,10 +1147,11 @@
             document.querySelectorAll('.ai-entry-popover').forEach(p => p.style.display = 'none'); // Close others
             popover.style.display = isVisible ? 'none' : 'flex';
 
-            // SHOW THE SUMMARY AREA IF IT EXISTS BUT IS HIDDEN
+            // 🤖 TOGGLE SUMMARY AREA
             const tldrBox = entry.querySelector('.tldr-container');
-            if (tldrBox && tldrBox.style.display === 'none' && !isVisible) {
-                tldrBox.style.display = 'block';
+            if (tldrBox && !isVisible) {
+                const isHidden = window.getComputedStyle(tldrBox).display === 'none';
+                tldrBox.style.display = isHidden ? 'block' : 'none';
             }
 
             if (!isVisible) popover.querySelector('input').focus();
