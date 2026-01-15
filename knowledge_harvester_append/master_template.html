@@ -1144,7 +1144,16 @@
                 if (response.ok) {
                     const data = await response.json();
                     tldrSpan.innerText = data.tldr;
-                    generateIndex(); // Refresh sidebar to show new TL;DR
+
+                    // UPDATE TAGS IN UI
+                    if (data.tags && data.tags.length > 0) {
+                        const tagContainer = entry.querySelector('.entry-tags');
+                        if (tagContainer) {
+                            tagContainer.innerHTML = data.tags.map(t => `<span class="tag-badge">${t}</span>`).join('');
+                        }
+                    }
+
+                    generateIndex(); // Refresh sidebar to show new TL;DR and Tags
                 } else {
                     tldrSpan.innerText = "AI Reasoning failed.";
                 }
@@ -1185,9 +1194,18 @@
                 if (response.ok) {
                     const data = await response.json();
                     tldrSpan.innerText = data.tldr;
+
+                    // UPDATE TAGS IN UI
+                    if (data.tags && data.tags.length > 0) {
+                        const tagContainer = entry.querySelector('.entry-tags');
+                        if (tagContainer) {
+                            tagContainer.innerHTML = data.tags.map(t => `<span class="tag-badge">${t}</span>`).join('');
+                        }
+                    }
+
                     generateIndex(); // Refresh sidebar to show new TL;DR
                 } else {
-                    tldrSpan.innerText = "Deep Thinking interrupted. Try again.";
+                    tldrSpan.innerText = "AI Refresh failed.";
                 }
             } catch (e) {
                 tldrSpan.innerText = "Connection lost. AI is offline.";
