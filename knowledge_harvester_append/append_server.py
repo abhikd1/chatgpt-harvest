@@ -1,4 +1,5 @@
 import os
+print("--- BOOTING SERVER ---")
 import asyncio
 import uuid
 from fastapi import FastAPI, Request
@@ -7,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datetime import datetime
 from pathlib import Path
+print("--- LIBRARIES LOADED ---")
 import uvicorn
 import re
 import httpx
@@ -164,19 +166,42 @@ async def generate_deep_research_tldr(content: str, system_prompt: str = None, u
     return tldr_final
 
 def init_master_file():
-    """Ensures the master file exists and is structurally sound."""
+    """Ensures the master file exists and is structurally sound with the correct markers."""
+    marker = "<!-- APPEND_HERE -->"
     if not MASTER_FILE.exists():
         if TEMPLATE_FILE.exists():
             with open(TEMPLATE_FILE, 'r', encoding='utf-8') as f:
                 content = f.read()
-            # Ensure the marker is INSIDE the container
-            marker = "\n            <!-- APPEND_HERE -->\n        "
-            initial_content = content.replace("{{CONTENT_PLACEHOLDER}}", marker)
+            # If template has placeholder, replace it. 
+            # If it already has the marker (from previous runs), leave it.
+            if "{{CONTENT_PLACEHOLDER}}" in content:
+                initial_content = content.replace("{{CONTENT_PLACEHOLDER}}", f"\n            {marker}\n        ")
+            elif marker not in content:
+                # Fallback: inject at container end
+                initial_content = content.replace("</div>", f"\n            {marker}\n        </div>", 1)
+            else:
+                initial_content = content
+            
             with open(MASTER_FILE, 'w', encoding='utf-8') as f:
                 f.write(initial_content)
         else:
             with open(MASTER_FILE, 'w', encoding='utf-8') as f:
-                f.write('<html><body><div class="container"><!-- APPEND_HERE --></div></body></html>')
+                f.write(f'<html><body><div class="container">{marker}</div></body></html>')
+    else:
+        # File exists, but ensure marker is there
+        with open(MASTER_FILE, 'r', encoding='utf-8') as f:
+            content = f.read()
+        if marker not in content and "<!-- ENTRY_START_" not in content:
+            # File is likely just the template but with placeholder still there
+            if "{{CONTENT_PLACEHOLDER}}" in content:
+                content = content.replace("{{CONTENT_PLACEHOLDER}}", marker)
+                with open(MASTER_FILE, 'w', encoding='utf-8') as f:
+                    f.write(content)
+            elif "</div>" in content:
+                # Add marker if totally missing
+                content = content.replace("</div>", f"\n{marker}\n</div>", 1)
+                with open(MASTER_FILE, 'w', encoding='utf-8') as f:
+                    f.write(content)
 
 def append_to_master(new_html: str, source: str):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -212,14 +237,21 @@ def append_to_master(new_html: str, source: str):
     with open(MASTER_FILE, 'r', encoding='utf-8') as f:
         full_content = f.read()
     
-    if "<!-- APPEND_HERE -->" not in full_content:
-        # Emergency recovery: if marker is gone, re-add it at the end of the container
+    marker = "<!-- APPEND_HERE -->"
+    if marker not in full_content:
+        # Robust Re-injection strategy
         if '</div>' in full_content:
-            parts = full_content.split('</div>')
-            # Assuming last div is container end
-            full_content = '</div>'.join(parts[:-1]) + "\n<!-- APPEND_HERE -->\n</div>" + parts[-1]
+            # Try to find the container div specifically
+            if '<div class="container">' in full_content:
+                parts = full_content.split('<div class="container">')
+                inner_parts = parts[1].split('</div>')
+                # Inject just before the FIRST internal </div> after container start
+                full_content = parts[0] + '<div class="container">' + inner_parts[0] + f"\n{marker}\n</div>" + '</div>'.join(inner_parts[1:])
+            else:
+                # Last resort
+                full_content = full_content.replace('</body>', f'{marker}\n</body>')
 
-    updated_content = full_content.replace("<!-- APPEND_HERE -->", wrapped_content)
+    updated_content = full_content.replace(marker, wrapped_content, 1)
     with open(MASTER_FILE, 'w', encoding='utf-8') as f:
         f.write(updated_content)
     return entry_id
@@ -388,42 +420,51 @@ async def clear_log():
 
 @app.get("/view")
 async def view_master():
+    print(f"[{datetime.now()}] VIEW REQUEST RECEIVED")
     if not MASTER_FILE.exists():
-        return HTMLResponse("<h1>No captures yet.</h1>")
+        print("Master file missing, initializing...")
+        init_master_file()
     
     try:
-        # Read the current log data
+        print("Reading MASTER_FILE...")
         with open(MASTER_FILE, 'r', encoding='utf-8') as f:
             log_content = f.read()
+        print(f"Read {len(log_content)} bytes from master.")
         
-        # Extract the entries block
-        # We look for the first entry start or just the container content
-        if "<!-- ENTRY_START_" in log_content:
-            parts = log_content.split("<!-- ENTRY_START_")
-            # Keep everything from the first marker onwards until the end of the container
-            # Actually, let's just find the container content carefully
-            container_start = '<div class="container">'
-            container_end = '</div>' # Assuming last div is container end
-            
-            if container_start in log_content:
-                c_parts = log_content.split(container_start)
-                inner = c_parts[1].rsplit(container_end, 1)[0]
-                entries_html = inner.strip()
-            else:
-                entries_html = "<!-- APPEND_HERE -->"
-        else:
+        # 🔗 ROBUST ENTRY EXTRACTION
+        entries_html = ""
+        start_tag = "<!-- ENTRY_START_"
+        end_tag = "<!-- ENTRY_END_"
+        
+        if start_tag in log_content:
+            first_idx = log_content.find(start_tag)
+            last_marker_idx = log_content.rfind(end_tag)
+            if last_marker_idx != -1:
+                end_of_marker = log_content.find("-->", last_marker_idx)
+                if end_of_marker != -1:
+                    entries_html = log_content[first_idx:end_of_marker+3].strip()
+                    print(f"Extracted {len(entries_html)} bytes of entries.")
+        
+        if not entries_html:
+            print("No entries extracted, using marker only.")
             entries_html = "<!-- APPEND_HERE -->"
+        else:
+            entries_html += "\n        <!-- APPEND_HERE -->"
 
-        # Read the latest template
+        print("Reading TEMPLATE_FILE...")
         with open(TEMPLATE_FILE, 'r', encoding='utf-8') as f:
             template_content = f.read()
         
-        # Inject entries into the latest template UI
+        print("Injecting content into template...")
         final_html = template_content.replace("{{CONTENT_PLACEHOLDER}}", entries_html)
+        print("Injection complete. Sending response.")
         
         return HTMLResponse(final_html)
     except Exception as e:
-        return HTMLResponse(f"<h1>Error rendering log: {str(e)}</h1>")
+        import traceback
+        err = f"Render Critical Error: {e}\n{traceback.format_exc()}"
+        print(err)
+        return HTMLResponse(f"<h1>Render Error</h1><pre>{err}</pre>")
 
 if __name__ == "__main__":
     print("\n" + "="*60)
