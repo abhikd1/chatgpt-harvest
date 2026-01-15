@@ -74,7 +74,11 @@ document.getElementById('captureBtn').addEventListener('click', async () => {
                     // Remove UI buttons from fragment
                     container.querySelectorAll('svg, button, .sr-only').forEach(x => x.remove());
 
-                    return { html: container.innerHTML, source: "Selection" };
+                    const pageTitle = document.title;
+                    const pageHost = window.location.hostname;
+                    const fullSource = `${pageTitle} (${pageHost})`;
+
+                    return { html: container.innerHTML, source: fullSource };
                 }
 
                 // --- CASE 2: AUTOMATIC ASSISTANT BLOCK ---
@@ -95,7 +99,12 @@ document.getElementById('captureBtn').addEventListener('click', async () => {
                 }
 
                 clone.querySelectorAll('svg, button, .sr-only, [aria-hidden="true"]').forEach(x => x.remove());
-                return { html: clone.innerHTML, source: "Assistant Message" };
+
+                const pageTitle = document.title;
+                const pageHost = window.location.hostname;
+                const fullSource = `${pageTitle} (${pageHost})`;
+
+                return { html: clone.innerHTML, source: fullSource };
             }
         });
 
