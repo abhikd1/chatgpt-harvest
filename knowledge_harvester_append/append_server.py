@@ -146,11 +146,11 @@ async def generate_deep_research_tldr(content: str, system_prompt: str = None, u
         tldr_reasoning = await call_ollama("llama3.1", reasoning_sys, clean_text)
 
     # STEP 2: Concise Explanation + Tags
-    explain_sys = system_prompt or "Provide a punchy 1-sentence TL;DR and 3-5 relevant hashtags."
+    explain_sys = system_prompt or "Provide a punchy 1-sentence TL;DR and 1-2 highly relevant hashtags (max 3 only if very long)."
     explain_user = (
         f"REASONING:\n{tldr_reasoning}\n\n"
         f"CONTENT:\n{clean_text}\n\n"
-        "Final Task: Provide a 1-sentence summary AND 3-5 hashtags (e.g. #Python #AI). "
+        "Final Task: Provide a 1-sentence summary AND hashtags. RULES: 1 tag for short content, 2 tags for normal, MAX 3 for huge/complex topics. "
         "Format your response as: [Summary] | [Tags]"
     )
     tldr_raw = None
