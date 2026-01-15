@@ -261,6 +261,69 @@
             border-top-color: rgba(255, 255, 255, 0.05);
         }
 
+        .tag-badge {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .tag-badge:hover {
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        .tag-filter-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .tag-filter-badge:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        .tag-filter-badge.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #2563eb;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+        }
+
+        .toc-tag {
+            font-size: 9px;
+            opacity: 0.8;
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        #tag-cloud {
+            padding: 15px;
+            gap: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        html[data-theme="dark"] #tag-cloud {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
         /* AI Settings Modal */
         .ai-modal {
             display: none;
@@ -723,6 +786,7 @@
 
     <nav class="sidebar-toc" id="sidebar-toc">
         <div class="toc-title">📗 Knowledge Index</div>
+        <div id="tag-cloud"></div>
         <div id="toc-entries">
             <!-- Dynamic entries go here -->
         </div>
@@ -764,25 +828,49 @@
             generateIndex();
         }
         // GENERATE TOC
+        let activeTagFilter = null;
+
         function generateIndex() {
             const container = document.getElementById('toc-entries');
             if (!container) return;
             container.innerHTML = '<h3>Harvest Index</h3>';
 
+            const tagCloud = document.getElementById('tag-cloud');
+            if (tagCloud) tagCloud.innerHTML = '';
+            const allTags = new Set();
+
             const entries = document.querySelectorAll('.harvest-entry');
             if (entries.length === 0) {
+                if (tagCloud) tagCloud.style.display = 'none';
                 container.innerHTML += '<div style="font-size:13px; color:var(--text-secondary); font-style:italic;">No entries yet. Capture something!</div>';
                 return;
             }
+            if (tagCloud) tagCloud.style.display = 'flex';
 
             entries.forEach(entry => {
                 const id = entry.id;
-                const metadata = entry.querySelector('.metadata').innerText;
+                const metadataEl = entry.querySelector('.metadata');
+                const metadata = metadataEl ? metadataEl.innerText : "";
                 const content = entry.querySelector('.content').innerText;
-                const time = metadata.split('|')[0].replace('Captured on: ', '').trim();
+                const timeStr = metadata.split('|')[0].replace('Captured on: ', '').trim();
 
-                // Smart Title: 1st H1/H2 or first 4-5 words
-                let title = "Update " + time;
+                // Extract Tags for Cloud and Index
+                const tagBadges = entry.querySelectorAll('.tag-badge');
+                const entryTags = Array.from(tagBadges).map(b => b.innerText);
+                entryTags.forEach(t => allTags.add(t));
+
+                // Filter Logic
+                if (activeTagFilter && !entryTags.includes(activeTagFilter)) {
+                    entry.style.display = 'none';
+                } else {
+                    entry.style.display = 'block';
+                }
+
+                // Skip TOC generation if filtered out
+                if (activeTagFilter && !entryTags.includes(activeTagFilter)) return;
+
+                // Smart Title
+                let title = "Update " + timeStr;
                 const hTag = entry.querySelector('h1, h2, h3');
                 if (hTag) {
                     title = hTag.innerText;
@@ -790,7 +878,6 @@
                     title = content.split('\n')[0].substring(0, 30) + "...";
                 }
 
-                // AI TL;DR Extraction
                 const tldrEl = entry.querySelector('.tldr-content');
                 const tldr = tldrEl ? tldrEl.innerText : "";
 
@@ -802,13 +889,47 @@
                     scrollToEntry(id);
                 };
 
+                const tagHtml = entryTags.map(t => `<span class="toc-tag">${t}</span>`).join(' ');
+
                 item.innerHTML = `
-                    ${title}
-                    <span class="toc-item-meta">${time}</span>
+                    <div style="font-weight:600; margin-bottom:2px;">${title}</div>
+                    <div style="display:flex; gap:4px; margin-bottom:6px; flex-wrap:wrap;">${tagHtml}</div>
+                    <span class="toc-item-meta">${timeStr}</span>
                     <span class="toc-tldr">${tldr}</span>
                 `;
                 container.appendChild(item);
             });
+
+            // Populate Tag Cloud
+            if (tagCloud && allTags.size > 0) {
+                // Add a "Clear" button if filter is active
+                if (activeTagFilter) {
+                    const clearBtn = document.createElement('span');
+                    clearBtn.className = 'tag-filter-badge active';
+                    clearBtn.style.background = '#ef4444';
+                    clearBtn.style.borderColor = '#dc2626';
+                    clearBtn.innerHTML = '✕ Clear';
+                    clearBtn.onclick = () => {
+                        activeTagFilter = null;
+                        generateIndex();
+                    };
+                    tagCloud.appendChild(clearBtn);
+                }
+
+                [...allTags].sort().forEach(tag => {
+                    const badge = document.createElement('span');
+                    badge.className = 'tag-filter-badge' + (activeTagFilter === tag ? ' active' : '');
+                    badge.innerText = tag;
+                    badge.onclick = () => {
+                        activeTagFilter = (activeTagFilter === tag) ? null : tag;
+                        generateIndex();
+                    };
+                    tagCloud.appendChild(badge);
+                });
+            } else if (tagCloud) {
+                tagCloud.style.display = 'none';
+            }
+
             updateActiveToC();
         }
 

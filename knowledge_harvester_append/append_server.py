@@ -126,9 +126,9 @@ async def generate_deep_research_tldr(content: str, system_prompt: str = None, u
     """
     Implements the requested 2-step process optimized for a normal laptop:
     Step 1: LLaMA Deep Reasoning (~6-7 GB RAM)
-    Step 2: Phi-3 Explanation (~3-4 GB RAM)
+    Step 2: Phi-3 Explanation + Smart Tagging (~3-4 GB RAM)
     """
-    print("\n--- DEEP RESEARCH MISSION (LOCAL OLLAMA) ---")
+    print("\n--- DEEP RESEARCH MISSION (TAGGING ENABLED) ---")
     start_time = datetime.now()
     clean_text = re.sub(r'<[^>]*>', '', content)[:4000]
     
@@ -145,25 +145,45 @@ async def generate_deep_research_tldr(content: str, system_prompt: str = None, u
         print("Fallback: Using Local Ollama for Step 1 (Llama 3.1)...")
         tldr_reasoning = await call_ollama("llama3.1", reasoning_sys, clean_text)
 
-    # STEP 2: Concise Explanation
-    explain_sys = system_prompt or "Provide a punchy 1-sentence TL;DR based on the reasoning provided."
-    explain_user = f"REASONING:\n{tldr_reasoning}\n\nCONTENT:\n{clean_text}\n\nFinal 1-sentence summary:"
-    tldr_final = None
+    # STEP 2: Concise Explanation + Tags
+    explain_sys = system_prompt or "Provide a punchy 1-sentence TL;DR and 3-5 relevant hashtags."
+    explain_user = (
+        f"REASONING:\n{tldr_reasoning}\n\n"
+        f"CONTENT:\n{clean_text}\n\n"
+        "Final Task: Provide a 1-sentence summary AND 3-5 hashtags (e.g. #Python #AI). "
+        "Format your response as: [Summary] | [Tags]"
+    )
+    tldr_raw = None
 
     if groq_client and api_key and api_key != "FAILED_KEY":
-        print("STEP 2: Concise Explanation (Cloud Groq Llama 8B)...")
-        tldr_final = await generate_tldr(content, explain_sys, explain_user, model="llama-3.1-8b-instant")
+        print("STEP 2: Concise Explanation + Tags (Cloud Groq Llama 8B)...")
+        tldr_raw = await generate_tldr(content, explain_sys, explain_user, model="llama-3.1-8b-instant")
     
-    if not tldr_final or "Error:" in tldr_final:
+    if not tldr_raw or "Error:" in tldr_raw:
         print("Fallback: Using Local Ollama for Step 2 (Phi-3)...")
-        tldr_final = await call_ollama("phi3:mini", explain_sys, explain_user)
+        tldr_raw = await call_ollama("phi3:mini", explain_sys, explain_user)
     
+    # Parse output: "Summary text... | #Tag1 #Tag2"
+    tldr_final = tldr_raw
+    tags = []
+    if "|" in tldr_raw:
+        parts = tldr_raw.split("|")
+        tldr_final = parts[0].strip()
+        tags_raw = parts[1].strip()
+        tags = [t.strip() for t in tags_raw.split() if t.startswith("#")]
+    else:
+        # Fallback if AI didn't follow format well
+        found_tags = re.findall(r'#\w+', tldr_raw)
+        if found_tags:
+            tags = found_tags
+            tldr_final = re.sub(r'#\w+', '', tldr_raw).strip()
+
     end_time = datetime.now()
     duration = (end_time - start_time).total_seconds()
-    print(f"RESEARCH MISSION COMPLETE: {duration:.1f}s [TOTAL LOAD: ~11GB RAM]")
+    print(f"RESEARCH MISSION COMPLETE: {duration:.1f}s [TAGS: {', '.join(tags)}]")
     print("-------------------------------------------\n")
     
-    return tldr_final
+    return {"tldr": tldr_final, "tags": tags}
 
 def init_master_file():
     """Ensures the master file exists and is structurally sound with the correct markers."""
@@ -219,8 +239,9 @@ def append_to_master(new_html: str, source: str):
                 <button onclick="openEntryAI('{entry_id}')" class="control-btn ai-btn" title="AI Process">🤖</button>
                 <button onclick="deleteEntry('{entry_id}')" class="control-btn delete-btn" title="Delete">🗑️</button>
             </div>
-            <div class="metadata" style="color: #9ca3af; font-size: 0.8em; margin-bottom: 5px;">
-                Captured on: {timestamp} | Source: {source}
+            <div class="metadata" style="color: #9ca3af; font-size: 0.8em; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center;">
+                <span>Captured on: {timestamp} | Source: {source}</span>
+                <div class="entry-tags" id="tags-{entry_id}" style="display: flex; gap: 5px; flex-wrap: wrap;"></div>
             </div>
             <div class="tldr-container" style="background: rgba(59, 130, 246, 0.05); border-left: 3px solid #3b82f6; padding: 10px 15px; margin-bottom: 15px; font-size: 13px; font-style: italic; color: var(--text-primary);">
                 <strong>⚡ AI TL;DR:</strong> <span class="tldr-content" id="tldr-{entry_id}">Generating summary...</span>
@@ -263,14 +284,14 @@ file_lock = asyncio.Lock()
 async def capture(data: CaptureData):
     try:
         entry_id = append_to_master(data.html, data.source)
-        # Background task for TL;DR with default prompt
+        # Background task for TL;DR and TAGS
         asyncio.create_task(process_tldr_and_update(entry_id, data.html))
         return {"status": "success", "url": "http://localhost:8771/view", "id": entry_id}
     except Exception as e:
         return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
 
-async def update_file_tldr(entry_id: str, tldr: str):
-    # This just updates the file, doesn't need to generate anything
+async def update_file_tldr(entry_id: str, tldr: str, tags: list = None):
+    # This updates both the TL;DR and the TAGS in the file
     try:
         async with file_lock: 
             with open(MASTER_FILE, 'r', encoding='utf-8') as f:
@@ -284,9 +305,17 @@ async def update_file_tldr(entry_id: str, tldr: str):
             if len(entry_parts) < 2: return
             entry_block, suffix = entry_parts[0], entry_parts[1]
             
-            pattern = rf'id="tldr-{entry_id}">.*?</span>'
-            replacement = f'id="tldr-{entry_id}">{tldr}</span>'
-            new_entry_block = re.sub(pattern, replacement, entry_block, flags=re.DOTALL)
+            # 1. Update TL;DR
+            pattern_tldr = rf'id="tldr-{entry_id}">.*?</span>'
+            repl_tldr = f'id="tldr-{entry_id}">{tldr}</span>'
+            new_entry_block = re.sub(pattern_tldr, repl_tldr, entry_block, flags=re.DOTALL)
+            
+            # 2. Update TAGS
+            if tags:
+                tag_html = "".join([f'<span class="tag-badge" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; margin-left: 5px;">{t}</span>' for t in tags])
+                pattern_tags = rf'id="tags-{entry_id}">.*?</div>'
+                repl_tags = f'id="tags-{entry_id}">{tag_html}</div>'
+                new_entry_block = re.sub(pattern_tags, repl_tags, new_entry_block, flags=re.DOTALL)
             
             updated_file = prefix + start_marker + new_entry_block + f"<!-- ENTRY_END_{entry_id} -->" + suffix
             with open(MASTER_FILE, 'w', encoding='utf-8') as f:
@@ -295,9 +324,8 @@ async def update_file_tldr(entry_id: str, tldr: str):
         print(f"File update failed: {e}")
 
 async def process_tldr_and_update(entry_id: str, content: str, system_prompt: str = None, user_prompt: str = ""):
-    # Use the new Deep Research Pipeline for all captures
-    tldr = await generate_deep_research_tldr(content, system_prompt, user_prompt)
-    await update_file_tldr(entry_id, tldr)
+    result = await generate_deep_research_tldr(content, system_prompt, user_prompt)
+    await update_file_tldr(entry_id, result["tldr"], result["tags"])
 
 @app.post("/summarize")
 async def summarize(data: SummarizeData):
